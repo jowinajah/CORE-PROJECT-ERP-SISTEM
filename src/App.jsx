@@ -8,6 +8,7 @@ import BossNotesRealtime from './components/BossNotesRealtime';
 import PoProjectView from './components/PoProjectView';
 import PaymentProofView from './components/PaymentProofView';
 import MeetingHolidayView from './components/MeetingHolidayView';
+import FactoryViews from './components/FactoryViews'; // Komponen gabungan fitur Factory & Produksi
 import { 
   LayoutDashboard, 
   Users, 
@@ -21,6 +22,13 @@ import {
   FileSpreadsheet,
   Receipt,
   CalendarDays,
+  Factory,
+  Calendar,
+  Activity,
+  Boxes,
+  Calculator,
+  ScanLine,
+  GitBranch,
   Menu,
   X
 } from 'lucide-react';
@@ -53,12 +61,12 @@ export default function App() {
         </button>
       </div>
 
-      {/* SIDEBAR UTAMA - GOLD ELEGANT & LOGO */}
+      {/* SIDEBAR UTAMA */}
       <aside className={`
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header dengan Logo Asli & Teks Elegan */}
+        {/* Brand Header */}
         <div className="p-5 border-b border-amber-500/20 flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-transparent">
           <img 
             src="/logo.png" 
@@ -172,6 +180,64 @@ export default function App() {
               </button>
             </div>
           </div>
+
+          {/* FACTORY & PRODUKSI (BARU DI BAWAH PREMIER BOS JOW) */}
+          <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
+            <div className="flex items-center gap-2 px-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+              <Factory className="w-4 h-4" /> Factory & Produksi
+            </div>
+            <div className="space-y-1 text-xs">
+              <button
+                onClick={() => { setActiveTab('factory-deadline'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-deadline' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Calendar className="w-4 h-4 text-amber-400" /> Kalender Dateline
+              </button>
+              <button
+                onClick={() => { setActiveTab('factory-tracking'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-tracking' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Activity className="w-4 h-4 text-amber-400" /> Tracking Proses
+              </button>
+              <button
+                onClick={() => { setActiveTab('factory-stock'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-stock' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Boxes className="w-4 h-4 text-amber-400" /> Stok Bahan Baku
+              </button>
+              <button
+                onClick={() => { setActiveTab('factory-calc'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-calc' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Calculator className="w-4 h-4 text-amber-400" /> Hitung Kebutuhan Bahan
+              </button>
+              <button
+                onClick={() => { setActiveTab('factory-barcode'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-barcode' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ScanLine className="w-4 h-4 text-amber-400" /> Scan Barcode Factory
+              </button>
+              <button
+                onClick={() => { setActiveTab('factory-bom'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'factory-bom' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <GitBranch className="w-4 h-4 text-amber-400" /> BOM & Alur Lanjutan
+              </button>
+            </div>
+          </div>
+
         </div>
 
         {/* Profil BOS JOW */}
@@ -202,6 +268,7 @@ export default function App() {
           {activeTab === 'zoom' && <ZoomView />}
           {activeTab === 'ai-assistant' && <AiAssistant />}
           {activeTab === 'boss-notes' && <BossNotesRealtime />}
+          {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
         </div>
       </main>
 
