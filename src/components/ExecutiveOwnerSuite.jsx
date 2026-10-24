@@ -11,14 +11,13 @@ import {
   Palette, 
   MessageSquareQuote, 
   PlusCircle, 
-  FileText,
   ExternalLink,
   Send,
-  Check
+  Check,
+  Volume2
 } from 'lucide-react';
 
 export default function ExecutiveOwnerSuite() {
-  // Statistik Overview Utama
   const [stats] = useState({
     omsetBulanIni: 48500000,
     pesananAktif: 14,
@@ -26,7 +25,34 @@ export default function ExecutiveOwnerSuite() {
     selesaiBulanIni: 38
   });
 
-  // State untuk Notes & Kegiatan (bisa ditambah langsung)
+  // Daftar sapaan suara harian otomatis berganti setiap hari (Minggu - Sabtu)
+  const dailyGreetings = [
+    "Selamat hari Minggu, BOS JOW! Waktunya istirahat sejenak atau susun strategi bisnis baru.",
+    "Selamat hari Senin, BOS JOW! Semangat gasspol produksi konveksi minggu ini!",
+    "Selamat hari Selasa, BOS JOW! Pastikan antrean sablon dan cutting berjalan lancar tanpa macet.",
+    "Selamat hari Rabu, BOS JOW! Pertengahan minggu, saatnya genjot omset dan kontrol kualitas jahit.",
+    "Selamat hari Kamis, BOS JOW! Cek kembali deadline SPK klien agar tepat waktu.",
+    "Selamat hari Jumat, BOS JOW! Berkah melimpah, semoga semua batch produksi selesai tuntas.",
+    "Selamat hari Sabtu, BOS JOW! Evaluasi workshop dan siapkan rekap laporan mingguan."
+  ];
+
+  const todayIndex = new Date().getDay(); // 0 (Minggu) sampai 6 (Sabtu)
+  const currentGreetingText = dailyGreetings[todayIndex];
+
+  // Fungsi untuk memutar suara sapaan menggunakan Web Speech API browser
+  const speakGreeting = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(currentGreetingText);
+      utterance.lang = 'id-ID';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Maaf, browser Anda tidak mendukung fitur suara sapaan.");
+    }
+  };
+
   const [notes, setNotes] = useState([
     { id: 1, text: 'Briefing pagi koordinasi bahan kain & SPK urgent KKN UIN', done: true },
     { id: 2, text: 'Cek hasil cetak sablon DTF batch Komunitas X-Rider', done: false },
@@ -34,7 +60,6 @@ export default function ExecutiveOwnerSuite() {
   ]);
   const [newNote, setNewNote] = useState('');
 
-  // State untuk Kotak Aduan & Saran
   const [feedbacks, setFeedbacks] = useState([
     { id: 1, sender: 'Tim Jahit Lt. 2', text: 'Mesin obras butuh pelumasan berkala minggu ini.', date: 'Hari ini' },
     { id: 2, sender: 'Bagian Cutting', text: 'Stok kain Nagata Drill hitam menipis, perlu restock.', date: 'Kemarin' }
@@ -73,16 +98,22 @@ export default function ExecutiveOwnerSuite() {
         <div>
           <div className="flex items-center gap-2 text-indigo-400 text-sm font-medium mb-1">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            Selamat Datang, Pak CEO Sahrul! • CORE Project Executive Suite
+            Selamat Datang, BOS JOW! • CORE Project Executive Suite
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
             Dashboard Overview & Workshop Control
           </h1>
           <p className="text-slate-400 text-sm mt-1">
-            Pantau omset, alur rantai estafet produksi, meeting live, hingga lab desain secara real-time.
+            {currentGreetingText}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <button 
+            onClick={speakGreeting}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+          >
+            <Volume2 className="w-4 h-4 animate-bounce" /> Putar Suara Sapaan
+          </button>
           <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all cursor-pointer">
             <PlusCircle className="w-4 h-4" />
             Buat SPK / Order Baru
@@ -139,7 +170,7 @@ export default function ExecutiveOwnerSuite() {
         </div>
       </div>
 
-      {/* 2. FITUR: ALUR CHANEL / RANTAI ESTAFET PRODUKSI */}
+      {/* 2. ALUR CHANEL / RANTAI ESTAFET PRODUKSI */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -189,10 +220,10 @@ export default function ExecutiveOwnerSuite() {
         </div>
       </div>
 
-      {/* Grid 3 Kolom: Notes & Kegiatan | Zoom Meet | Lab Tim Design */}
+      {/* Grid 3 Kolom: Notes | Zoom | Lab Desain */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* 3. FITUR: NOTES & KEGIATAN */}
+        {/* 3. NOTES & KEGIATAN */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-md font-bold text-white flex items-center gap-2 mb-4">
@@ -234,7 +265,7 @@ export default function ExecutiveOwnerSuite() {
           </form>
         </div>
 
-        {/* 4. FITUR: ZOOM MEET CORE PROJECT */}
+        {/* 4. ZOOM MEET CORE PROJECT */}
         <div className="bg-gradient-to-br from-indigo-950/60 via-slate-900 to-slate-900 border border-indigo-900/50 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start mb-3">
@@ -255,7 +286,7 @@ export default function ExecutiveOwnerSuite() {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Host / Pemimpin:</span>
-                <span className="text-indigo-400 font-medium">Pak CEO Sahrul</span>
+                <span className="text-indigo-400 font-medium">BOS JOW</span>
               </div>
             </div>
           </div>
@@ -270,7 +301,7 @@ export default function ExecutiveOwnerSuite() {
           </a>
         </div>
 
-        {/* 5. FITUR: LAB TIM DESIGN */}
+        {/* 5. LAB TIM DESIGN */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-3">
@@ -310,7 +341,7 @@ export default function ExecutiveOwnerSuite() {
 
       </div>
 
-      {/* 6. FITUR: KOTAK ADUAN & SARAN */}
+      {/* 6. KOTAK ADUAN & SARAN */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <MessageSquareQuote className="w-5 h-5 text-indigo-400" />
@@ -321,7 +352,6 @@ export default function ExecutiveOwnerSuite() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Daftar Aduan Masuk */}
           <div className="lg:col-span-2 space-y-3">
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Aduan & Aspirasi Terbaru</h4>
             <div className="space-y-2.5">
@@ -337,7 +367,6 @@ export default function ExecutiveOwnerSuite() {
             </div>
           </div>
 
-          {/* Form Kirim Aduan / Saran */}
           <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
             <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Tulis Pesan / Saran Baru</h4>
             <form onSubmit={handleAddFeedback} className="space-y-3">
