@@ -11,7 +11,8 @@ import MeetingHolidayView from './components/MeetingHolidayView';
 import FactoryViews from './components/FactoryViews';
 import MitraViews from './components/MitraViews';
 import FinanceViews from './components/FinanceViews';
-import HrdViews from './components/HrdViews'; // <-- Import modul HRD
+import HrdViews from './components/HrdViews';
+import MarketingViews from './components/MarketingViews'; // <-- Import modul Marketing
 import { 
   LayoutDashboard, 
   Users, 
@@ -50,6 +51,10 @@ import {
   ReceiptText,
   Award,
   Banknote,
+  Megaphone,
+  Clapperboard,
+  CreditCard,
+  Trophy,
   ChevronDown,
   Menu,
   X
@@ -64,8 +69,9 @@ export default function App() {
     main: true,
     workshop: true,
     finance: true,
-    mitra: true,
     hrd: true,
+    marketing: true, // <-- State Accordion Marketing
+    mitra: true,
     premier: true,
     factory: true
   });
@@ -267,7 +273,53 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 4: HRD & KARYAWAN (BARU) */}
+          {/* Kategori 4: Marketing & Sales (BARU) */}
+          <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
+            <button 
+              onClick={() => toggleSection('marketing')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><Megaphone className="w-4 h-4" /> Marketing & Sales</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.marketing ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.marketing ? 'max-h-56 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <button
+                onClick={() => { setActiveTab('marketing-reseller'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'marketing-reseller' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Users className="w-4 h-4 text-amber-400" /> Reseller & Kemitraan
+              </button>
+              <button
+                onClick={() => { setActiveTab('marketing-content'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'marketing-content' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Clapperboard className="w-4 h-4 text-amber-400" /> Content Creator Labs
+              </button>
+              <button
+                onClick={() => { setActiveTab('marketing-rekening'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'marketing-rekening' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <CreditCard className="w-4 h-4 text-amber-400" /> No Rekening Marketing
+              </button>
+              <button
+                onClick={() => { setActiveTab('marketing-ranking'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'marketing-ranking' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Trophy className="w-4 h-4 text-amber-400" /> Rangking Marketing
+              </button>
+            </div>
+          </div>
+
+          {/* Kategori 5: HRD & KARYAWAN */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('hrd')}
@@ -337,7 +389,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 5: Mitra Core */}
+          {/* Kategori 6: Mitra Core */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('mitra')}
@@ -375,7 +427,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 6: Fitur Premier BOS JOW */}
+          {/* Kategori 7: Fitur Premier BOS JOW */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -405,7 +457,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 7: Factory & Produksi */}
+          {/* Kategori 8: Factory & Produksi */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('factory')}
@@ -501,6 +553,7 @@ export default function App() {
           {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
           {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
           {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
+          {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
         </div>
       </main>
 
