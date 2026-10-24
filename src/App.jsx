@@ -12,7 +12,7 @@ import FactoryViews from './components/FactoryViews';
 import MitraViews from './components/MitraViews';
 import FinanceViews from './components/FinanceViews';
 import HrdViews from './components/HrdViews';
-import MarketingViews from './components/MarketingViews'; // <-- Import modul Marketing
+import MarketingViews from './components/MarketingViews';
 import { 
   LayoutDashboard, 
   Users, 
@@ -70,7 +70,7 @@ export default function App() {
     workshop: true,
     finance: true,
     hrd: true,
-    marketing: true, // <-- State Accordion Marketing
+    marketing: true,
     mitra: true,
     premier: true,
     factory: true
@@ -131,7 +131,7 @@ export default function App() {
         {/* Menu Navigasi dengan Accordion */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           
-          {/* Kategori 1: Menu Utama */}
+          {/* Kategori 1: Menu Utama (CRM dipindah ke Premier) */}
           <div className="space-y-1">
             <button 
               onClick={() => toggleSection('main')}
@@ -141,7 +141,7 @@ export default function App() {
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.main ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
             </button>
             
-            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -149,15 +149,6 @@ export default function App() {
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" /> Dashboard Overview
-              </button>
-
-              <button
-                onClick={() => { setActiveTab('crm'); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  activeTab === 'crm' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Users className="w-4 h-4" /> Database Konsumen & CRM
               </button>
             </div>
           </div>
@@ -273,7 +264,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 4: Marketing & Sales (BARU) */}
+          {/* Kategori 4: Marketing & Sales */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('marketing')}
@@ -427,7 +418,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 7: Fitur Premier BOS JOW */}
+          {/* Kategori 7: Fitur Premier BOS JOW (Termasuk Database Konsumen & CRM) */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -437,7 +428,7 @@ export default function App() {
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.premier ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
             </button>
 
-            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('ai-assistant'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -453,6 +444,14 @@ export default function App() {
                 }`}
               >
                 <BellRing className="w-4 h-4 text-amber-400" /> 2. Catatan Realtime BOS
+              </button>
+              <button
+                onClick={() => { setActiveTab('crm'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'crm' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Users className="w-4 h-4 text-amber-400" /> 3. Database Konsumen & CRM
               </button>
             </div>
           </div>
