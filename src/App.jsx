@@ -8,7 +8,7 @@ import BossNotesRealtime from './components/BossNotesRealtime';
 import PoProjectView from './components/PoProjectView';
 import PaymentProofView from './components/PaymentProofView';
 import MeetingHolidayView from './components/MeetingHolidayView';
-import FactoryViews from './components/FactoryViews'; // Komponen gabungan fitur Factory & Produksi
+import FactoryViews from './components/FactoryViews';
 import { 
   LayoutDashboard, 
   Users, 
@@ -29,6 +29,7 @@ import {
   Calculator,
   ScanLine,
   GitBranch,
+  ChevronDown,
   Menu,
   X
 } from 'lucide-react';
@@ -36,6 +37,21 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // State untuk mengontrol Accordion Menu (buka/tutup kategori)
+  const [openSections, setOpenSections] = useState({
+    main: true,
+    workshop: true,
+    premier: true,
+    factory: true
+  });
+
+  const toggleSection = (section) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans">
@@ -61,7 +77,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* SIDEBAR UTAMA */}
+      {/* SIDEBAR UTAMA - ACCORDION MENU */}
       <aside className={`
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
@@ -82,11 +98,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* Menu Navigasi */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">Menu Utama</p>
-            <div className="space-y-1">
+        {/* Menu Navigasi dengan Accordion */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          
+          {/* Kategori 1: Menu Utama */}
+          <div className="space-y-1">
+            <button 
+              onClick={() => toggleSection('main')}
+              className="w-full flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5 hover:text-white transition-colors cursor-pointer"
+            >
+              <span>Menu Utama</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.main ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+            
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -107,9 +132,17 @@ export default function App() {
             </div>
           </div>
 
-          <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">Fitur Workshop</p>
-            <div className="space-y-1">
+          {/* Kategori 2: Fitur Workshop */}
+          <div className="space-y-1 pt-2 border-t border-slate-800/80">
+            <button 
+              onClick={() => toggleSection('workshop')}
+              className="w-full flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5 hover:text-white transition-colors cursor-pointer"
+            >
+              <span>Fitur Workshop</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.workshop ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.workshop ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
               <div className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs text-slate-400 hover:bg-slate-800/40 transition-colors cursor-pointer">
                 <Layers className="w-4 h-4 text-amber-400" /> Rantai Estafet Produksi
               </div>
@@ -156,12 +189,17 @@ export default function App() {
             </div>
           </div>
 
-          {/* FITUR PREMIER BOS JOW */}
+          {/* Kategori 3: Fitur Premier BOS JOW */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
-            <div className="flex items-center gap-2 px-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-              <span>⭐</span> Fitur Premier BOS JOW
-            </div>
-            <div className="space-y-1">
+            <button 
+              onClick={() => toggleSection('premier')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><span>⭐</span> Fitur Premier BOS JOW</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.premier ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('ai-assistant'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -181,12 +219,17 @@ export default function App() {
             </div>
           </div>
 
-          {/* FACTORY & PRODUKSI (BARU DI BAWAH PREMIER BOS JOW) */}
+          {/* Kategori 4: Factory & Produksi */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
-            <div className="flex items-center gap-2 px-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-              <Factory className="w-4 h-4" /> Factory & Produksi
-            </div>
-            <div className="space-y-1 text-xs">
+            <button 
+              onClick={() => toggleSection('factory')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><Factory className="w-4 h-4" /> Factory & Produksi</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.factory ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.factory ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('factory-deadline'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
