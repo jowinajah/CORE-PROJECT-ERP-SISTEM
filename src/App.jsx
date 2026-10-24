@@ -10,6 +10,7 @@ import PaymentProofView from './components/PaymentProofView';
 import MeetingHolidayView from './components/MeetingHolidayView';
 import FactoryViews from './components/FactoryViews';
 import MitraViews from './components/MitraViews';
+import FinanceViews from './components/FinanceViews'; // <-- Import modul Finance
 import { 
   LayoutDashboard, 
   Users, 
@@ -34,6 +35,12 @@ import {
   Building2,
   Truck,
   Store,
+  Wallet,
+  TrendingUp,
+  ArrowLeftRight,
+  BookOpen,
+  FileText,
+  ScanText,
   ChevronDown,
   Menu,
   X
@@ -47,6 +54,7 @@ export default function App() {
   const [openSections, setOpenSections] = useState({
     main: true,
     workshop: true,
+    finance: true,
     mitra: true,
     premier: true,
     factory: true
@@ -195,7 +203,61 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 3: Mitra Core (BARU) */}
+          {/* Kategori 3: Finance & Kas (BARU) */}
+          <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
+            <button 
+              onClick={() => toggleSection('finance')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><Wallet className="w-4 h-4" /> Finance & Kas</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.finance ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.finance ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <button
+                onClick={() => { setActiveTab('finance-pl'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'finance-pl' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 text-amber-400" /> Laba Rugi (P&L)
+              </button>
+              <button
+                onClick={() => { setActiveTab('finance-cashflow'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'finance-cashflow' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ArrowLeftRight className="w-4 h-4 text-amber-400" /> Cashflow & Arus Kas
+              </button>
+              <button
+                onClick={() => { setActiveTab('finance-ledger'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'finance-ledger' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-amber-400" /> Accounting & Buku Kas
+              </button>
+              <button
+                onClick={() => { setActiveTab('finance-invoice'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'finance-invoice' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <FileText className="w-4 h-4 text-amber-400" /> Invoice & Tagihan DP
+              </button>
+              <button
+                onClick={() => { setActiveTab('finance-ocr'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'finance-ocr' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ScanText className="w-4 h-4 text-amber-400" /> AI Scan OCR Nota
+              </button>
+            </div>
+          </div>
+
+          {/* Kategori 4: Mitra Core */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('mitra')}
@@ -233,7 +295,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 4: Fitur Premier BOS JOW */}
+          {/* Kategori 5: Fitur Premier BOS JOW */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -263,7 +325,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 5: Factory & Produksi */}
+          {/* Kategori 6: Factory & Produksi */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('factory')}
@@ -357,6 +419,7 @@ export default function App() {
           {activeTab === 'boss-notes' && <BossNotesRealtime />}
           {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
           {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
+          {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
         </div>
       </main>
 
