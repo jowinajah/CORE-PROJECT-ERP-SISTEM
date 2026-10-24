@@ -10,11 +10,11 @@ import {
   X,
   CheckCircle,
   MapPin,
-  Tag
+  Tag,
+  Pencil
 } from 'lucide-react';
 
 export default function ClientCRM() {
-  // Data awal klien konveksi CORE Project
   const [clients, setClients] = useState([
     { 
       id: 1, 
@@ -53,9 +53,10 @@ export default function ClientCRM() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null); // null = Tambah baru, berisikan ID = Mode Edit
 
-  // State form tambah klien baru dengan pilihan produk lengkap & total transaksi
-  const [newClient, setNewClient] = useState({
+  // State form untuk tambah atau edit data
+  const [formData, setFormData] = useState({
     name: '',
     org: '',
     phone: '',
@@ -78,19 +79,10 @@ export default function ClientCRM() {
     c.productType.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddClient = (e) => {
-    e.preventDefault();
-    if (!newClient.name || !newClient.org) return;
-
-    const clientToAdd = {
-      id: clients.length + 1,
-      ...newClient,
-      totalOrders: Number(newClient.totalOrders) || 1,
-      totalSpent: Number(newClient.totalSpent) || 0
-    };
-
-    setClients([clientToAdd, ...clients]);
-    setNewClient({
+  // Buka modal untuk Tambah Klien Baru
+  const handleOpenAddModal = () => {
+    setEditingId(null);
+    setFormData({
       name: '',
       org: '',
       phone: '',
@@ -100,6 +92,49 @@ export default function ClientCRM() {
       totalOrders: 1,
       totalSpent: 0
     });
+    setShowModal(true);
+  };
+
+  // Buka modal untuk Edit Klien yang sudah ada
+  const handleOpenEditModal = (client) => {
+    setEditingId(client.id);
+    setFormData({
+      name: client.name,
+      org: client.org,
+      phone: client.phone,
+      city: client.city,
+      status: client.status,
+      productType: client.productType,
+      totalOrders: client.totalOrders,
+      totalSpent: client.totalSpent
+    });
+    setShowModal(true);
+  };
+
+  // Handle Simpan (bisa untuk Tambah maupun Edit)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.org) return;
+
+    if (editingId !== null) {
+      // Proses Update Klien Lama
+      setClients(clients.map(c => c.id === editingId ? {
+        ...c,
+        ...formData,
+        totalOrders: Number(formData.totalOrders) || 1,
+        totalSpent: Number(formData.totalSpent) || 0
+      } : c));
+    } else {
+      // Proses Tambah Klien Baru
+      const newClient = {
+        id: clients.length > 0 ? Math.max(...clients.map(c => c.id)) + 1 : 1,
+        ...formData,
+        totalOrders: Number(formData.totalOrders) || 1,
+        totalSpent: Number(formData.totalSpent) || 0
+      };
+      setClients([newClient, ...clients]);
+    }
+
     setShowModal(false);
   };
 
@@ -116,11 +151,11 @@ export default function ClientCRM() {
             Database Klien & Partner Konveksi
           </h1>
           <p className="text-slate-400 text-sm mt-1">
-            Kelola data instansi, kampus, komunitas, jenis pesanan, serta total transaksi secara real-time.
+            Kelola data instansi, kampus, komunitas, jenis pesanan, serta pembaruan data secara real-time.
           </p>
         </div>
         <button 
-          onClick={() => setShowModal(true)}
+          onClick={handleOpenAddModal}
           className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
@@ -156,7 +191,8 @@ export default function ClientCRM() {
                 <th className="px-4 py-3">Jenis Pesanan Utama</th>
                 <th className="px-4 py-3">Status / Tier</th>
                 <th className="px-4 py-3">Total Order</th>
-                <th className="px-4 py-3 rounded-r-lg">Total Transaksi</th>
+                <th className="px-4 py-3">Total Transaksi</th>
+                <th className="px-4 py-3 rounded-r-lg text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
@@ -194,11 +230,20 @@ export default function ClientCRM() {
                     <td className="px-4 py-3 font-bold text-emerald-400">
                       {formatRupiah(client.totalSpent)}
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      <button 
+                        onClick={() => handleOpenEditModal(client)}
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-all flex items-center gap-1 mx-auto cursor-pointer"
+                        title="Edit Data Klien"
+                      >
+                        <Pencil className="w-3 h-3" /> Edit
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-8 text-slate-500 text-sm">
+                  <td colSpan="7" className="text-center py-8 text-slate-500 text-sm">
                     Tidak ada klien yang cocok dengan pencarian.
                   </td>
                 </tr>
@@ -208,14 +253,14 @@ export default function ClientCRM() {
         </div>
       </div>
 
-      {/* Modal Tambah Klien & Jenis Pesanan */}
+      {/* Modal Form Tambah / Edit Klien */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4 my-8">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-400" />
-                Tambah Klien & Riwayat Order Baru
+                {editingId !== null ? 'Edit Data Klien & Order' : 'Tambah Klien & Riwayat Order Baru'}
               </h3>
               <button 
                 onClick={() => setShowModal(false)}
@@ -225,7 +270,7 @@ export default function ClientCRM() {
               </button>
             </div>
 
-            <form onSubmit={handleAddClient} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Nama PIC / Kontak</label>
@@ -233,8 +278,8 @@ export default function ClientCRM() {
                     type="text" 
                     required
                     placeholder="Contoh: Sahrul"
-                    value={newClient.name}
-                    onChange={(e) => setNewClient({...newClient, name: e.target.value})}
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -244,8 +289,8 @@ export default function ClientCRM() {
                     type="text" 
                     required
                     placeholder="Contoh: KKN UIN Bandung"
-                    value={newClient.org}
-                    onChange={(e) => setNewClient({...newClient, org: e.target.value})}
+                    value={formData.org}
+                    onChange={(e) => setFormData({...formData, org: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -257,8 +302,8 @@ export default function ClientCRM() {
                   <input 
                     type="text" 
                     placeholder="0812xxxxxxxx"
-                    value={newClient.phone}
-                    onChange={(e) => setNewClient({...newClient, phone: e.target.value})}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -267,8 +312,8 @@ export default function ClientCRM() {
                   <input 
                     type="text" 
                     placeholder="Bandung"
-                    value={newClient.city}
-                    onChange={(e) => setNewClient({...newClient, city: e.target.value})}
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -278,8 +323,8 @@ export default function ClientCRM() {
               <div>
                 <label className="block text-xs font-semibold text-indigo-400 uppercase mb-1">Jenis Pesanan</label>
                 <select 
-                  value={newClient.productType}
-                  onChange={(e) => setNewClient({...newClient, productType: e.target.value})}
+                  value={formData.productType}
+                  onChange={(e) => setFormData({...formData, productType: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                 >
                   <option value="Kemeja PDH">Kemeja PDH</option>
@@ -311,8 +356,8 @@ export default function ClientCRM() {
                   <input 
                     type="number" 
                     min="1"
-                    value={newClient.totalOrders}
-                    onChange={(e) => setNewClient({...newClient, totalOrders: e.target.value})}
+                    value={formData.totalOrders}
+                    onChange={(e) => setFormData({...formData, totalOrders: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -322,8 +367,8 @@ export default function ClientCRM() {
                     type="number" 
                     step="50000"
                     placeholder="Contoh: 2500000"
-                    value={newClient.totalSpent}
-                    onChange={(e) => setNewClient({...newClient, totalSpent: e.target.value})}
+                    value={formData.totalSpent}
+                    onChange={(e) => setFormData({...formData, totalSpent: e.target.value})}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -332,8 +377,8 @@ export default function ClientCRM() {
               <div>
                 <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Status / Tier Klien</label>
                 <select 
-                  value={newClient.status}
-                  onChange={(e) => setNewClient({...newClient, status: e.target.value})}
+                  value={formData.status}
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                 >
                   <option value="Reguler">Reguler</option>
@@ -356,7 +401,7 @@ export default function ClientCRM() {
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <CheckCircle className="w-4 h-4" /> Simpan Klien
+                  <CheckCircle className="w-4 h-4" /> {editingId !== null ? 'Simpan Perubahan' : 'Simpan Klien'}
                 </button>
               </div>
             </form>
