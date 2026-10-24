@@ -112,10 +112,9 @@ export default function App() {
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header bergaya referensi */}
+        {/* Brand Header dengan Logo & Badge ERP Workshop */}
         <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {/* Logo Image */}
             <img 
               src="/logo.png" 
               alt="CORE Project Logo" 
@@ -126,25 +125,17 @@ export default function App() {
               <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-xs tracking-wider uppercase">
                 CORE PROJECT
               </h1>
-              {/* Badge Label ERP Workshop */}
               <span className="inline-block mt-0.5 px-2 py-0.5 bg-amber-500/15 border border-amber-500/30 text-[9px] font-bold text-amber-400 rounded-md tracking-wide uppercase">
                 ERP WORKSHOP
               </span>
             </div>
           </div>
         </div>
-          <div>
-            <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-sm tracking-widest uppercase drop-shadow">
-              CORE PROJECT
-            </h1>
-            <p className="text-[10px] font-medium text-amber-400/80 tracking-wider">ERP Konveksi & Percetakan</p>
-          </div>
-        </div>
 
         {/* Menu Navigasi dengan Accordion */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           
-          {/* Kategori 1: Menu Utama (CRM dipindah ke Premier) */}
+          {/* Kategori 1: Menu Utama */}
           <div className="space-y-1">
             <button 
               onClick={() => toggleSection('main')}
@@ -431,7 +422,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 7: Fitur Premier BOS JOW (Termasuk Database Konsumen & CRM) */}
+          {/* Kategori 7: Fitur Premier BOS JOW (Termasuk CRM) */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -507,68 +498,4 @@ export default function App() {
               <button
                 onClick={() => { setActiveTab('factory-calc'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
-                  activeTab === 'factory-calc' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Calculator className="w-4 h-4 text-amber-400" /> Hitung Kebutuhan Bahan
-              </button>
-              <button
-                onClick={() => { setActiveTab('factory-barcode'); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
-                  activeTab === 'factory-barcode' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <ScanLine className="w-4 h-4 text-amber-400" /> Scan Barcode Factory
-              </button>
-              <button
-                onClick={() => { setActiveTab('factory-bom'); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
-                  activeTab === 'factory-bom' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <GitBranch className="w-4 h-4 text-amber-400" /> BOM & Alur Lanjutan
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Profil BOS JOW */}
-        <div className="p-4 border-t border-amber-500/20 bg-slate-950/60">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/40">
-              BJ
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-white">BOS JOW</p>
-              <p className="text-[10px] text-amber-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Gold Elegant Active
-              </p>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-screen bg-slate-950 p-4 sm:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
-          {activeTab === 'crm' && <ClientCRM />}
-          {activeTab === 'po-project' && <PoProjectView />}
-          {activeTab === 'payment' && <PaymentProofView />}
-          {activeTab === 'meeting-libur' && <MeetingHolidayView />}
-          {activeTab === 'notes' && <NotesView />}
-          {activeTab === 'zoom' && <ZoomView />}
-          {activeTab === 'ai-assistant' && <AiAssistant />}
-          {activeTab === 'boss-notes' && <BossNotesRealtime />}
-          {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
-          {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
-          {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
-          {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
-          {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
-        </div>
-      </main>
-
-    </div>
-  );
-}
+                  activeTab === 'factory-calc'
