@@ -112,14 +112,27 @@ export default function App() {
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header */}
-        <div className="p-5 border-b border-amber-500/20 flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-transparent">
-          <img 
-            src="/logo.png" 
-            alt="CORE Project Logo" 
-            className="w-11 h-11 object-contain rounded-xl border border-amber-500/40 bg-slate-950 p-1 shadow-lg shadow-amber-500/20"
-            onError={(e)=>{e.target.style.display='none';}} 
-          />
+        {/* Brand Header bergaya referensi */}
+        <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {/* Logo Image */}
+            <img 
+              src="/logo.png" 
+              alt="CORE Project Logo" 
+              className="w-10 h-10 object-contain rounded-xl border border-amber-500/40 bg-slate-950 p-1 shadow-md shadow-amber-500/20"
+              onError={(e)=>{e.target.style.display='none';}} 
+            />
+            <div>
+              <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-xs tracking-wider uppercase">
+                CORE PROJECT
+              </h1>
+              {/* Badge Label ERP Workshop */}
+              <span className="inline-block mt-0.5 px-2 py-0.5 bg-amber-500/15 border border-amber-500/30 text-[9px] font-bold text-amber-400 rounded-md tracking-wide uppercase">
+                ERP WORKSHOP
+              </span>
+            </div>
+          </div>
+        </div>
           <div>
             <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-sm tracking-widest uppercase drop-shadow">
               CORE PROJECT
