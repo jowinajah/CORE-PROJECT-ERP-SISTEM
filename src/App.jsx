@@ -10,7 +10,8 @@ import PaymentProofView from './components/PaymentProofView';
 import MeetingHolidayView from './components/MeetingHolidayView';
 import FactoryViews from './components/FactoryViews';
 import MitraViews from './components/MitraViews';
-import FinanceViews from './components/FinanceViews'; // <-- Import modul Finance
+import FinanceViews from './components/FinanceViews';
+import HrdViews from './components/HrdViews'; // <-- Import modul HRD
 import { 
   LayoutDashboard, 
   Users, 
@@ -41,6 +42,14 @@ import {
   BookOpen,
   FileText,
   ScanText,
+  UsersRound,
+  UserPlus,
+  ScanFace,
+  CalendarCheck,
+  Clock,
+  ReceiptText,
+  Award,
+  Banknote,
   ChevronDown,
   Menu,
   X
@@ -56,6 +65,7 @@ export default function App() {
     workshop: true,
     finance: true,
     mitra: true,
+    hrd: true,
     premier: true,
     factory: true
   });
@@ -203,7 +213,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 3: Finance & Kas (BARU) */}
+          {/* Kategori 3: Finance & Kas */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('finance')}
@@ -257,7 +267,77 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 4: Mitra Core */}
+          {/* Kategori 4: HRD & KARYAWAN (BARU) */}
+          <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
+            <button 
+              onClick={() => toggleSection('hrd')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><UsersRound className="w-4 h-4" /> HRD & Karyawan</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.hrd ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.hrd ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <button
+                onClick={() => { setActiveTab('hrd-ats'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-ats' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <UserPlus className="w-4 h-4 text-amber-400" /> Rekruitmen HRD ATS
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-faceid'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-faceid' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ScanFace className="w-4 h-4 text-amber-400" /> Absensi Face ID
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-calendar'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-calendar' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <CalendarCheck className="w-4 h-4 text-amber-400" /> Kalender Kerja & Libur
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-overtime'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-overtime' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Clock className="w-4 h-4 text-amber-400" /> Pengajuan Lembur
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-reimburse'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-reimburse' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ReceiptText className="w-4 h-4 text-amber-400" /> Klaim Reimburse
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-kpi'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-kpi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Award className="w-4 h-4 text-amber-400" /> Penilaian KPI
+              </button>
+              <button
+                onClick={() => { setActiveTab('hrd-cashadvance'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'hrd-cashadvance' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Banknote className="w-4 h-4 text-amber-400" /> Kasbon Karyawan
+              </button>
+            </div>
+          </div>
+
+          {/* Kategori 5: Mitra Core */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('mitra')}
@@ -295,7 +375,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 5: Fitur Premier BOS JOW */}
+          {/* Kategori 6: Fitur Premier BOS JOW */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -325,7 +405,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 6: Factory & Produksi */}
+          {/* Kategori 7: Factory & Produksi */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('factory')}
@@ -420,6 +500,7 @@ export default function App() {
           {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
           {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
           {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
+          {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
         </div>
       </main>
 
