@@ -9,6 +9,7 @@ import PoProjectView from './components/PoProjectView';
 import PaymentProofView from './components/PaymentProofView';
 import MeetingHolidayView from './components/MeetingHolidayView';
 import FactoryViews from './components/FactoryViews';
+import MitraViews from './components/MitraViews';
 import { 
   LayoutDashboard, 
   Users, 
@@ -29,6 +30,10 @@ import {
   Calculator,
   ScanLine,
   GitBranch,
+  Handshake,
+  Building2,
+  Truck,
+  Store,
   ChevronDown,
   Menu,
   X
@@ -38,10 +43,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // State untuk mengontrol Accordion Menu (buka/tutup kategori)
+  // State untuk mengontrol Accordion Menu
   const [openSections, setOpenSections] = useState({
     main: true,
     workshop: true,
+    mitra: true,
     premier: true,
     factory: true
   });
@@ -189,7 +195,45 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 3: Fitur Premier BOS JOW */}
+          {/* Kategori 3: Mitra Core (BARU) */}
+          <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
+            <button 
+              onClick={() => toggleSection('mitra')}
+              className="w-full flex items-center justify-between text-amber-400 text-xs font-bold uppercase tracking-wider px-2 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2"><Handshake className="w-4 h-4" /> Mitra Core</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.mitra ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
+            </button>
+
+            <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.mitra ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <button
+                onClick={() => { setActiveTab('mitra-factory'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'mitra-factory' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Building2 className="w-4 h-4 text-amber-400" /> Mitra Factory
+              </button>
+              <button
+                onClick={() => { setActiveTab('mitra-supplier'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'mitra-supplier' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Truck className="w-4 h-4 text-amber-400" /> Mitra Supplier
+              </button>
+              <button
+                onClick={() => { setActiveTab('mitra-reseller'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
+                  activeTab === 'mitra-reseller' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Store className="w-4 h-4 text-amber-400" /> Mitra Reseller
+              </button>
+            </div>
+          </div>
+
+          {/* Kategori 4: Fitur Premier BOS JOW */}
           <div className="bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 p-3 rounded-2xl space-y-2 shadow-lg">
             <button 
               onClick={() => toggleSection('premier')}
@@ -219,7 +263,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Kategori 4: Factory & Produksi */}
+          {/* Kategori 5: Factory & Produksi */}
           <div className="bg-slate-900 border border-amber-500/30 p-3 rounded-2xl space-y-2 shadow-md">
             <button 
               onClick={() => toggleSection('factory')}
@@ -312,6 +356,7 @@ export default function App() {
           {activeTab === 'ai-assistant' && <AiAssistant />}
           {activeTab === 'boss-notes' && <BossNotesRealtime />}
           {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
+          {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
         </div>
       </main>
 
