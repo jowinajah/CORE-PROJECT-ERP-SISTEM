@@ -112,7 +112,7 @@ export default function App() {
               BJ
             </div>
             <div>
-              <p className="text-xs font-semibold text-white">CEO FAHMI</p>
+              <p className="text-xs font-semibold text-white">BOS JOW</p>
               <p className="text-[10px] text-emerald-400 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
               </p>
@@ -131,4 +131,4 @@ export default function App() {
 
     </div>
   );
-}   
+}
