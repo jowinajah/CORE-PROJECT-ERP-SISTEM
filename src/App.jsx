@@ -105,14 +105,14 @@ export default function App() {
           </div>
         </div>
 
-        {/* Profil CEO di Bawah Sidebar */}
+        {/* Profil BOS JOW di Bawah Sidebar */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/40">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs border border-indigo-500/30">
-              CS
+              BJ
             </div>
             <div>
-              <p className="text-xs font-semibold text-white">Pak CEO Sahrul</p>
+              <p className="text-xs font-semibold text-white">CEO FAHMI</p>
               <p className="text-[10px] text-emerald-400 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
               </p>
@@ -121,7 +121,7 @@ export default function App() {
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA (Di Sebelah Kanan Sidebar) */}
+      {/* MAIN CONTENT AREA */}
       <main className="flex-1 min-h-screen bg-slate-950 p-4 sm:p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
           {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
@@ -131,4 +131,4 @@ export default function App() {
 
     </div>
   );
-}
+}   
