@@ -57,7 +57,8 @@ import {
   Trophy,
   ChevronDown,
   Menu,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 
 export default function App() {
@@ -112,7 +113,7 @@ export default function App() {
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header dengan Logo & Badge ERP Workshop */}
+        {/* Brand Header dengan Logo Asli & Badge ERP Workshop (Sesuai Referensi Gambar 1) */}
         <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img 
@@ -540,25 +541,68 @@ export default function App() {
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 min-h-screen bg-slate-950 p-4 sm:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
-          {activeTab === 'crm' && <ClientCRM />}
-          {activeTab === 'po-project' && <PoProjectView />}
-          {activeTab === 'payment' && <PaymentProofView />}
-          {activeTab === 'meeting-libur' && <MeetingHolidayView />}
-          {activeTab === 'notes' && <NotesView />}
-          {activeTab === 'zoom' && <ZoomView />}
-          {activeTab === 'ai-assistant' && <AiAssistant />}
-          {activeTab === 'boss-notes' && <BossNotesRealtime />}
-          {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
-          {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
-          {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
-          {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
-          {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
-        </div>
-      </main>
+      {/* MAIN CONTENT AREA DENGAN TOP ACTION BAR */}
+      <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto">
+        
+        {/* TOP ACTION BAR (SET BAR UNTUK PENAMBAHAN FITUR / SHORTCUT SESUAI REFERENSI GAMBAR 2) */}
+        <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md">
+          <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
+              <Zap className="w-3.5 h-3.5" /> Quick Workshop:
+            </span>
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <span>⚡ Rantai Estafet</span> 
+              <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded text-[10px] font-bold">14 Task</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('hrd-faceid')} 
+              className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <span>👤 Absen Face ID</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('factory-barcode')} 
+              className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <span>📷 Scan Barcode</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('finance-cashflow')} 
+              className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <span>💰 Arus Kas</span>
+            </button>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2 text-xs text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl whitespace-nowrap">
+            <span>👑 BOS JOW (Executive Suite)</span>
+          </div>
+        </header>
+
+        {/* KONTEN UTAMA */}
+        <main className="flex-1 p-4 sm:p-8">
+          <div className="max-w-7xl mx-auto">
+            {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
+            {activeTab === 'crm' && <ClientCRM />}
+            {activeTab === 'po-project' && <PoProjectView />}
+            {activeTab === 'payment' && <PaymentProofView />}
+            {activeTab === 'meeting-libur' && <MeetingHolidayView />}
+            {activeTab === 'notes' && <NotesView />}
+            {activeTab === 'zoom' && <ZoomView />}
+            {activeTab === 'ai-assistant' && <AiAssistant />}
+            {activeTab === 'boss-notes' && <BossNotesRealtime />}
+            {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
+            {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
+            {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
+            {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
+            {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
+          </div>
+        </main>
+
+      </div>
 
     </div>
   );
