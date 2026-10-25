@@ -85,9 +85,9 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [topMenuOpen, setTopMenuOpen] = useState(false);
 
-  // State untuk Modal Notifikasi & Live Chat
+  // State untuk Modal Notifikasi & Widget Live Chat Mengambang
   const [showNotifModal, setShowNotifModal] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { sender: 'Marketing', text: 'Min, PO baru untuk Kemeja KKN UIN sudah di-input ya.', time: '14:00' },
     { sender: 'Produksi', text: 'Siap, bahan kain Nagata Drill sedang dipotong di meja cutting.', time: '14:05' }
@@ -588,13 +588,13 @@ export default function App() {
       </aside>
 
       {/* MAIN CONTENT AREA DENGAN TOP ACTION BAR */}
-      <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto relative">
         
         {/* TOP ACTION BAR DENGAN TOMBOL GARIS TIGA (MENU) */}
         <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md">
           <div className="flex items-center gap-3 overflow-x-auto py-1 scrollbar-none">
             
-            {/* Tombol Garis Tiga (Menu Dropdown untuk Logout, Notifikasi, Live Chat) */}
+            {/* Tombol Garis Tiga (Menu Dropdown untuk Notifikasi & Logout) */}
             <div className="relative">
               <button 
                 onClick={() => setTopMenuOpen(!topMenuOpen)}
@@ -606,7 +606,7 @@ export default function App() {
 
               {/* Dropdown Menu Garis Tiga */}
               {topMenuOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl py-2 z-50 space-y-1">
+                <div className="absolute left-0 mt-2 w-52 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl py-2 z-50 space-y-1">
                   <div className="px-4 py-2 border-b border-slate-800 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
                     Menu Cepat Perusahaan
                   </div>
@@ -615,12 +615,6 @@ export default function App() {
                     className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer"
                   >
                     <Bell className="w-4 h-4 text-amber-400" /> Notifikasi Sistem
-                  </button>
-                  <button 
-                    onClick={() => { setShowChatModal(true); setTopMenuOpen(false); }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer"
-                  >
-                    <MessageSquare className="w-4 h-4 text-emerald-400" /> Live Chat Antar Divisi
                   </button>
                   <div className="border-t border-slate-800 pt-1">
                     <button 
@@ -677,7 +671,7 @@ export default function App() {
                 <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
                   <Bell className="w-5 h-5 text-amber-400" /> Notifikasi Sistem & Workshop
                 </h3>
-                <button onClick={() => setShowNotifModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowNotifModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -702,49 +696,6 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL LIVE CHAT ANTAR DIVISI */}
-        {showChatModal && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-lg w-full shadow-2xl flex flex-col h-[500px]">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-emerald-400" /> Live Chat Antar Divisi CORE Project
-                </h3>
-                <button onClick={() => setShowChatModal(false)} className="text-slate-400 hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Box Chat Messages */}
-              <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                {chatMessages.map((msg, index) => (
-                  <div key={index} className={`p-3 rounded-2xl text-xs space-y-1 ${msg.sender === currentUser.name ? 'bg-amber-500/15 border border-amber-500/30 ml-8' : 'bg-slate-950 border border-slate-800 mr-8'}`}>
-                    <div className="flex justify-between items-center text-[10px] text-amber-400 font-bold">
-                      <span>{msg.sender}</span>
-                      <span className="text-slate-500">{msg.time}</span>
-                    </div>
-                    <p className="text-white">{msg.text}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Form Input Chat */}
-              <form onSubmit={handleSendChat} className="flex gap-2 pt-2 border-t border-slate-800">
-                <input 
-                  type="text" 
-                  placeholder="Ketik pesan antar divisi..." 
-                  value={chatInput} 
-                  onChange={(e) => setChatInput(e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
-                />
-                <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-1 cursor-pointer">
-                  <Send className="w-3.5 h-3.5" /> Kirim
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-
         {/* KONTEN UTAMA */}
         <main className="flex-1 p-4 sm:p-8">
           <div className="max-w-7xl mx-auto">
@@ -765,6 +716,68 @@ export default function App() {
             {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
           </div>
         </main>
+
+        {/* WIDGET LIVE CHAT MENGAMBANG DI POJOK KIRI BAWAH */}
+        <div className="fixed bottom-6 left-6 z-50">
+          {!isChatOpen ? (
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center shadow-2xl shadow-amber-500/40 hover:scale-110 transition-all cursor-pointer border border-amber-200 relative group"
+              title="Live Chat Antar Divisi"
+            >
+              <MessageSquare className="w-6 h-6" />
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-md animate-pulse">
+                2
+              </span>
+              <span className="absolute left-16 bg-slate-900 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity shadow-lg pointer-events-none">
+                💬 Live Chat Antar Divisi
+              </span>
+            </button>
+          ) : (
+            <div className="w-80 sm:w-96 h-[440px] bg-slate-900 border border-amber-500/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+              {/* Header Chat */}
+              <div className="bg-slate-950 px-4 py-3 border-b border-amber-500/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                  <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">Live Chat Antar Divisi</h3>
+                </div>
+                <button 
+                  onClick={() => setIsChatOpen(false)}
+                  className="text-slate-400 hover:text-white cursor-pointer p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Area Pesan */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-3 text-xs bg-slate-900/90">
+                {chatMessages.map((msg, index) => (
+                  <div key={index} className={`p-3 rounded-2xl space-y-1 ${msg.sender === currentUser.name ? 'bg-amber-500/15 border border-amber-500/30 ml-8' : 'bg-slate-950 border border-slate-800 mr-8'}`}>
+                    <div className="flex justify-between items-center text-[10px] text-amber-400 font-bold">
+                      <span>{msg.sender}</span>
+                      <span className="text-slate-500">{msg.time}</span>
+                    </div>
+                    <p className="text-white leading-relaxed">{msg.text}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Form Input Chat */}
+              <form onSubmit={handleSendChat} className="p-3 bg-slate-950 border-t border-amber-500/30 flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="Ketik pesan antar divisi..." 
+                  value={chatInput} 
+                  onChange={(e) => setChatInput(e.target.value)}
+                  className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+                />
+              <button type="submit" className="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold rounded-xl flex items-center justify-center cursor-pointer shadow-md">
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
 
       </div>
 
