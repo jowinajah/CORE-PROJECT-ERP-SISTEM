@@ -9,22 +9,37 @@ export default function FloatingMusicPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // Daftar Playlist Musik / Audio Workshop
+  // Playlist Full Album Perunggu (Memorandum & Hits Lainnya)
   const playlist = [
     {
-      title: 'Lo-Fi Workshop Chill',
-      artist: 'CORE Project Beats',
+      title: 'Menaruh Perhatian',
+      artist: 'Perunggu',
       url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
     },
     {
-      title: 'Deep Focus Confectionery',
-      artist: 'Executive Productivity',
+      title: '3 Menit 30 Detik',
+      artist: 'Perunggu',
       url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
     },
     {
-      title: 'Gold Elegant ambient',
-      artist: 'Boss Jow Special',
+      title: 'Kalibata Bawah',
+      artist: 'Perunggu',
       url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+    },
+    {
+      title: 'Pergi Bersua',
+      artist: 'Perunggu',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+    },
+    {
+      title: 'Ini Abadi',
+      artist: 'Perunggu',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    },
+    {
+      title: 'Biar',
+      artist: 'Perunggu',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
     }
   ];
 
@@ -82,21 +97,21 @@ export default function FloatingMusicPlayer() {
         onEnded={handleTrackEnd}
       />
 
-      {/* TOMBOL MENGAMBANG CONTROL CENTER (IKON PUSAT KONTROL) */}
+      {/* TOMBOL MENGAMBANG CONTROL CENTER */}
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
           className="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 text-slate-950 flex items-center justify-center shadow-2xl shadow-amber-500/50 hover:scale-110 transition-all cursor-pointer border-2 border-amber-100 relative group animate-pulse"
-          title="Buka Pusat Kontrol Musik"
+          title="Buka Pusat Kontrol Musik Perunggu"
         >
           <Sliders className="w-6 h-6 animate-spin-slow" />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-950"></span>
           <span className="absolute right-16 bg-slate-900 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity shadow-lg pointer-events-none">
-            🎵 Spotify Control Center
+            🎸 Perunggu - Full Album
           </span>
         </button>
       ) : (
-        /* WIDGET PEMUTAR MUSIK UTAMA ALA SPOTIFY */
+        /* WIDGET PEMUTAR MUSIK UTAMA */
         <div className="w-80 sm:w-96 bg-slate-900 border border-amber-500/40 rounded-3xl shadow-2xl p-5 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300 relative overflow-hidden backdrop-blur-xl">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-300 via-amber-500 to-amber-700"></div>
 
@@ -107,8 +122,8 @@ export default function FloatingMusicPlayer() {
                 <Radio className="w-4 h-4 animate-pulse" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Spotify Control Center</h4>
-                <p className="text-[10px] text-amber-400">CORE Project Audio Stream</p>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Perunggu - Memorandum</h4>
+                <p className="text-[10px] text-amber-400">Workshop Indie Rock Stream</p>
               </div>
             </div>
             <button 
@@ -154,48 +169,4 @@ export default function FloatingMusicPlayer() {
             </button>
             <button 
               onClick={handleNext}
-              className="p-2 text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
-              title="Lagu Selanjutnya"
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* PENGATUR VOLUME & PLAYLIST PILIHAN */}
-          <div className="pt-2 border-t border-slate-800 space-y-3">
-            <div className="flex items-center gap-3">
-              <button onClick={() => setIsMuted(!isMuted)} className="text-slate-400 hover:text-white cursor-pointer">
-                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
-              </button>
-              <input 
-                type="range" 
-                min="0" 
-                max="1" 
-                step="0.01"
-                value={isMuted ? 0 : volume}
-                onChange={(e) => { setVolume(parseFloat(e.target.value)); setIsMuted(false); }}
-                className="w-full accent-amber-400 bg-slate-950 h-1.5 rounded-lg cursor-pointer"
-              />
-            </div>
-
-            {/* DAFTAR PILIHAN LAGU */}
-            <div className="space-y-1 max-h-28 overflow-y-auto pr-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Pilih Lagu Workshop:</p>
-              {playlist.map((track, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => { setCurrentTrackIndex(idx); setIsPlaying(true); }}
-                  className={`w-full text-left px-3 py-1.5 rounded-xl text-[11px] flex items-center justify-between cursor-pointer transition-all ${currentTrackIndex === idx ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold' : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'}`}
-                >
-                  <span className="truncate">{track.title}</span>
-                  {currentTrackIndex === idx && isPlaying && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>}
-                </button>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      )}
-    </div>
-  );
-}
+              className="p-2 text-slate-300 hover:text-amber
