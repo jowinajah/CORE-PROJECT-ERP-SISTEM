@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Layers, Search, Plus, Package } from 'lucide-react';
+import { Layers, Search, Plus, Package, Edit3, Trash2, FileText, Upload, Check } from 'lucide-react';
 
 export default function RantaiProduksiView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [productionList, setProductionList] = useState([
-    { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Cutting', qty: '120 Pcs', deadline: '2026-11-05' },
-    { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Pengadaan Bahan Baku', qty: '45 Pcs', deadline: '2026-10-30' },
-    { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02' },
-    { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10' },
-    { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28' },
-    { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20' },
+    { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Sewing/Jahit', qty: '120 Pcs', deadline: '2026-11-05', spkFile: 'SPK_KKN_UIN.pdf' },
+    { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Selesai', qty: '45 Pcs', deadline: '2026-10-30', spkFile: 'SPK_Kopi_Senja.pdf' },
+    { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02', spkFile: 'SPK_XRider.pdf' },
+    { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10', spkFile: 'SPK_Textilindo.pdf' },
+    { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28', spkFile: 'SPK_Distro_BDG.pdf' },
+    { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20', spkFile: 'SPK_Sman1.pdf' },
   ]);
 
   const stages = [
@@ -22,28 +22,45 @@ export default function RantaiProduksiView() {
     'Selesai'
   ];
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newPo, setNewPo] = useState({ id: '', client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '' });
+  const [showModal, setShowModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentPo, setCurrentPo] = useState({ id: '', client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '' });
 
-  const handleAddPo = (e) => {
-    e.preventDefault();
-    if (!newPo.id || !newPo.client) return;
-    setProductionList([newPo, ...productionList]);
-    setNewPo({ id: '', client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '' });
-    setShowAddModal(false);
+  const handleOpenAdd = () => {
+    setIsEditMode(false);
+    setCurrentPo({ id: `PO-00${productionList.length + 1}`, client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '' });
+    setShowModal(true);
   };
 
-  const moveStage = (id, direction) => {
-    setProductionList(productionList.map(item => {
-      if (item.id === id) {
-        const currentIndex = stages.indexOf(item.stage);
-        const nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-        if (nextIndex >= 0 && nextIndex < stages.length) {
-          return { ...item, stage: stages[nextIndex] };
-        }
-      }
-      return item;
-    }));
+  const handleOpenEdit = (item) => {
+    setIsEditMode(true);
+    setCurrentPo(item);
+    setShowModal(true);
+  };
+
+  const handleSavePo = (e) => {
+    e.preventDefault();
+    if (!currentPo.id || !currentPo.client) return;
+    
+    if (isEditMode) {
+      setProductionList(productionList.map(item => item.id === currentPo.id ? currentPo : item));
+    } else {
+      setProductionList([currentPo, ...productionList]);
+    }
+    setShowModal(false);
+  };
+
+  const handleDelete = (id) => {
+    if (confirm('Yakin ingin menghapus data PO ini?')) {
+      setProductionList(productionList.filter(item => item.id !== id));
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCurrentPo({ ...currentPo, spkFile: file.name });
+    }
   };
 
   const filteredList = productionList.filter(item => 
@@ -61,14 +78,14 @@ export default function RantaiProduksiView() {
           <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold mb-1">
             <Layers className="w-4 h-4" /> Modul Workshop CORE Project
           </div>
-          <h1 className="text-2xl font-bold text-white">Rantai Estafet Produksi (7 Tahap)</h1>
-          <p className="text-slate-400 text-sm mt-1">Pantau dan pindahkan alur SPK dari List PO hingga selesai dengan mudah.</p>
+          <h1 className="text-2xl font-bold text-white">Rantai Estafet Produksi & SPK</h1>
+          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta lampiran dokumen SPK PDF.</p>
         </div>
         <button 
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAdd}
           className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
         >
-          <Plus className="w-4 h-4" /> Tambah SPK / PO Baru
+          <Plus className="w-4 h-4" /> Tambah PO & SPK Baru
         </button>
       </div>
 
@@ -77,82 +94,119 @@ export default function RantaiProduksiView() {
         <Search className="w-5 h-5 text-amber-400" />
         <input 
           type="text"
-          placeholder="Cari berdasarkan No. PO, Nama Klien, Jenis Pakaian, atau Tahapan..."
+          placeholder="Cari berdasarkan No. PO, Nama Klien, Jenis Pakaian, atau Proses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-transparent text-xs text-white focus:outline-none placeholder:text-slate-500"
         />
       </div>
 
-      {/* MODAL TAMBAH PO */}
-      {showAddModal && (
-        <form onSubmit={handleAddPo} className="bg-slate-900 border border-amber-500/30 p-5 rounded-2xl space-y-4 max-w-lg">
-          <h3 className="text-md font-bold text-amber-400">Tambah SPK / PO ke Rantai Produksi</h3>
-          <div className="grid grid-cols-2 gap-3">
+      {/* MODAL TAMBAH / EDIT PO & SPK */}
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <form onSubmit={handleSavePo} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-lg w-full shadow-2xl">
+            <h3 className="text-lg font-bold text-amber-400">
+              {isEditMode ? 'Edit Data PO & SPK Produksi' : 'Tambah PO & SPK Baru'}
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. PO / SPK</label>
+                <input 
+                  type="text" required placeholder="Contoh: PO-007"
+                  value={currentPo.id} onChange={(e) => setCurrentPo({...currentPo, id: e.target.value})}
+                  disabled={isEditMode}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white disabled:opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Jumlah (Qty)</label>
+                <input 
+                  type="text" required placeholder="Contoh: 100 Pcs"
+                  value={currentPo.qty} onChange={(e) => setCurrentPo({...currentPo, qty: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. PO / SPK</label>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Klien</label>
               <input 
-                type="text" required placeholder="Contoh: PO-007"
-                value={newPo.id} onChange={(e) => setNewPo({...newPo, id: e.target.value})}
+                type="text" required placeholder="Contoh: PT Maju Jaya"
+                value={currentPo.client} onChange={(e) => setCurrentPo({...currentPo, client: e.target.value})}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
               />
             </div>
+
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Jumlah (Qty)</label>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Jenis Pakaian / Bahan</label>
               <input 
-                type="text" required placeholder="Contoh: 100 Pcs"
-                value={newPo.qty} onChange={(e) => setNewPo({...newPo, qty: e.target.value})}
+                type="text" required placeholder="Contoh: Kemeja PDH American Drill"
+                value={currentPo.jenis} onChange={(e) => setCurrentPo({...currentPo, jenis: e.target.value})}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
               />
             </div>
-          </div>
-          <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Klien</label>
-            <input 
-              type="text" required placeholder="Contoh: PT Maju Jaya"
-              value={newPo.client} onChange={(e) => setNewPo({...newPo, client: e.target.value})}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Jenis Pakaian / Bahan</label>
-            <input 
-              type="text" required placeholder="Contoh: Kemeja PDH American Drill"
-              value={newPo.jenis} onChange={(e) => setNewPo({...newPo, jenis: e.target.value})}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Deadline / Target Selesai</label>
-            <input 
-              type="date" required
-              value={newPo.deadline} onChange={(e) => setNewPo({...newPo, deadline: e.target.value})}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 bg-slate-800 text-xs rounded-xl cursor-pointer">Batal</button>
-            <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer">Simpan & Masukkan ke Rantai</button>
-          </div>
-        </form>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Deadline / Target</label>
+                <input 
+                  type="date" required
+                  value={currentPo.deadline} onChange={(e) => setCurrentPo({...currentPo, deadline: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Proses Produksi</label>
+                <select
+                  value={currentPo.stage} onChange={(e) => setCurrentPo({...currentPo, stage: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                >
+                  {stages.map((st, i) => (
+                    <option key={i} value={st}>{st}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Upload File SPK (PDF)</label>
+              <div className="flex items-center gap-2">
+                <label className="flex-1 flex items-center justify-center gap-2 bg-slate-950 border border-dashed border-slate-700 hover:border-amber-500 rounded-xl p-3 text-xs text-slate-300 cursor-pointer">
+                  <Upload className="w-4 h-4 text-amber-400" />
+                  <span>{currentPo.spkFile || 'Pilih file PDF SPK...'}</span>
+                  <input type="file" accept=".pdf" onChange={handleFileChange} className="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3">
+              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl cursor-pointer">Batal</button>
+              <button type="submit" className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1.5">
+                <Check className="w-4 h-4" /> Simpan Data
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* TABEL / KANBAN DAFTAR PO */}
+      {/* TABEL DAFTAR PO & SPK */}
       <div className="bg-slate-900/80 border border-amber-500/20 rounded-2xl p-6 shadow-sm space-y-4">
         <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
-          <Package className="w-5 h-5" /> Daftar Tracking Status Produksi ({filteredList.length} PO)
+          <Package className="w-5 h-5" /> Daftar Tracking Status Produksi & SPK ({filteredList.length} PO)
         </h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-800/50 text-xs uppercase text-slate-400">
               <tr>
-                <th className="px-4 py-3">No. PO</th>
+                <th className="px-4 py-3">No. PO / SPK</th>
                 <th className="px-4 py-3">Klien & Jenis Pakaian</th>
                 <th className="px-4 py-3">Jumlah</th>
                 <th className="px-4 py-3">Deadline</th>
-                <th className="px-4 py-3">Tahapan Saat Ini (7 Langkah)</th>
-                <th className="px-4 py-3 text-center">Aksi Pindah Tahap</th>
+                <th className="px-4 py-3">Proses</th>
+                <th className="px-4 py-3">Dokumen SPK (PDF)</th>
+                <th className="px-4 py-3 text-center">Aksi (Edit / Hapus)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-xs">
@@ -170,27 +224,34 @@ export default function RantaiProduksiView() {
                       {item.stage}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    {item.spkFile ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[11px] font-medium">
+                        <FileText className="w-3.5 h-3.5" /> {item.spkFile}
+                      </span>
+                    ) : (
+                      <span className="text-slate-500 italic">Belum ada PDF</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center space-x-2">
                     <button 
-                      onClick={() => moveStage(item.id, 'prev')}
-                      disabled={item.stage === stages[0]}
-                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg text-[10px] font-semibold cursor-pointer"
+                      onClick={() => handleOpenEdit(item)}
+                      className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-bold cursor-pointer inline-flex items-center gap-1"
                     >
-                      ← Mundur
+                      <Edit3 className="w-3.5 h-3.5" /> Edit
                     </button>
                     <button 
-                      onClick={() => moveStage(item.id, 'next')}
-                      disabled={item.stage === stages[stages.length - 1]}
-                      className="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 text-slate-950 rounded-lg text-[10px] font-bold cursor-pointer"
+                      onClick={() => handleDelete(item.id)}
+                      className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold cursor-pointer inline-flex items-center gap-1"
                     >
-                      Lanjut →
+                      <Trash2 className="w-3.5 h-3.5" /> Hapus
                     </button>
                   </td>
                 </tr>
               ))}
               {filteredList.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center py-6 text-slate-500">Tidak ada data PO yang sesuai dengan pencarian.</td>
+                  <td colSpan="7" className="text-center py-6 text-slate-500">Tidak ada data PO yang sesuai dengan pencarian.</td>
                 </tr>
               )}
             </tbody>
