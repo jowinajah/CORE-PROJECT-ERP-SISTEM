@@ -1,16 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layers, Search, Plus, Package, Edit3, Trash2, FileText, Upload, Check, Download } from 'lucide-react';
 
 export default function RantaiProduksiView() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [productionList, setProductionList] = useState([
-    { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Sewing/Jahit', qty: '120 Pcs', deadline: '2026-11-05', spkFile: 'SPK_KKN_UIN.pdf', spkUrl: null },
-    { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Selesai', qty: '45 Pcs', deadline: '2026-10-30', spkFile: 'SPK_Kopi_Senja.pdf', spkUrl: null },
-    { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02', spkFile: 'SPK_XRider.pdf', spkUrl: null },
-    { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10', spkFile: 'SPK_Textilindo.pdf', spkUrl: null },
-    { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28', spkFile: 'SPK_Distro_BDG.pdf', spkUrl: null },
-    { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20', spkFile: 'SPK_Sman1.pdf', spkUrl: null },
-  ]);
+
+  // Menggunakan localStorage agar data tersimpan otomatis dan tidak hilang saat refresh
+  const [productionList, setProductionList] = useState(() => {
+    const savedData = localStorage.getItem('core_production_list');
+    if (savedData) {
+      try {
+        return JSON.parse(savedData);
+      } catch (e) {
+        console.error("Gagal memuat data dari localStorage", e);
+      }
+    }
+    // Data default awal jika localStorage masih kosong
+    return [
+      { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Sewing/Jahit', qty: '120 Pcs', deadline: '2026-11-05', spkFile: 'SPK_KKN_UIN.pdf', spkUrl: null },
+      { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Selesai', qty: '45 Pcs', deadline: '2026-10-30', spkFile: 'SPK_Kopi_Senja.pdf', spkUrl: null },
+      { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02', spkFile: 'SPK_XRider.pdf', spkUrl: null },
+      { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10', spkFile: 'SPK_Textilindo.pdf', spkUrl: null },
+      { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28', spkFile: 'SPK_Distro_BDG.pdf', spkUrl: null },
+      { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20', spkFile: 'SPK_Sman1.pdf', spkUrl: null },
+    ];
+  });
+
+  // Simpan ke localStorage secara otomatis setiap kali productionList berubah
+  useEffect(() => {
+    localStorage.setItem('core_production_list', JSON.stringify(productionList));
+  }, [productionList]);
 
   const stages = [
     'List PO & Jenis',
@@ -65,7 +83,7 @@ export default function RantaiProduksiView() {
     }
   };
 
-  // Fungsi download file PDF asli
+  // Fungsi download file PDF SPK
   const handleDownloadPdf = (item) => {
     if (item.spkUrl) {
       const element = document.createElement("a");
@@ -75,9 +93,8 @@ export default function RantaiProduksiView() {
       element.click();
       document.body.removeChild(element);
     } else {
-      // Jika data bawaan awal yang belum punya URL file asli, buatkan file PDF contoh yang valid
       const element = document.createElement("a");
-      const file = new Blob([`%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /MediaBox [0 0 612 792] /Contents 4 0 R >>\nendobj\n4 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (SURAT PERINTAH KERJA: ${item.id} - ${item.client}) Tj ET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n000000000.0 00000 n \n0000000096 00000 n \n0000000155 00000 n \n0000000282 00000 n \ntrailer\n<< /Root 1 0 R /Size 5 >>\nstartofxref\n387\n%%EOF`], {type: 'application/pdf'});
+      const file = new Blob([`%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /MediaBox [0 0 612 792] /Contents 4 0 R >>\nendobj\n4 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (SURAT PERINTAH KERJA: ${item.id} - ${item.client}) Tj ET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000000 00000 n \n0000000096 00000 n \n0000000155 00000 n \n0000000282 00000 n \ntrailer\n<< /Root 1 0 R /Size 5 >>\nstartofxref\n387\n%%EOF`], {type: 'application/pdf'});
       element.href = URL.createObjectURL(file);
       element.download = item.spkFile || "SPK_Produksi.pdf";
       document.body.appendChild(element);
@@ -102,7 +119,7 @@ export default function RantaiProduksiView() {
             <Layers className="w-4 h-4" /> Modul Workshop CORE Project
           </div>
           <h1 className="text-2xl font-bold text-white">Rantai Estafet Produksi & SPK</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta download file SPK PDF asli.</p>
+          <p className="text-slate-400 text-sm mt-1">Data tersimpan otomatis di browser sehingga aman tidak akan hilang saat halaman di-refresh.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
