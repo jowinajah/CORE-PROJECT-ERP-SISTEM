@@ -164,7 +164,8 @@ export default function RantaiProduksiView() {
                 <input 
                   type="date" required
                   value={currentPo.deadline} onChange={(e) => setCurrentPo({...currentPo, deadline: e.target.value})}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                  style={{ colorScheme: 'dark' }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 cursor-pointer"
                 />
               </div>
               <div>
@@ -181,7 +182,7 @@ export default function RantaiProduksiView() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Upload File SPK (PDF)</label>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Upload / Ganti File SPK (PDF)</label>
               <div className="flex items-center gap-2">
                 <label className="flex-1 flex items-center justify-center gap-2 bg-slate-950 border border-dashed border-slate-700 hover:border-amber-500 rounded-xl p-3 text-xs text-slate-300 cursor-pointer">
                   <Upload className="w-4 h-4 text-amber-400" />
@@ -285,22 +286,31 @@ export default function RantaiProduksiView() {
                     </div>
                   </td>
 
-                  {/* Kolom Dokumen SPK (Klik untuk Download) & Hapus */}
+                  {/* Kolom Dokumen SPK (Klik untuk Download/Edit) & Hapus */}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-between gap-3">
-                      {item.spkFile ? (
+                      <div className="flex items-center gap-2">
+                        {item.spkFile ? (
+                          <button 
+                            onClick={() => handleDownloadPdf(item.spkFile)}
+                            title="Klik untuk download PDF SPK"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl text-[11px] font-medium cursor-pointer transition-all shadow-sm"
+                          >
+                            <FileText className="w-3.5 h-3.5" /> 
+                            <span>{item.spkFile}</span>
+                            <Download className="w-3 h-3 ml-1 text-blue-300 animate-pulse" />
+                          </button>
+                        ) : (
+                          <span className="text-slate-500 italic">Belum ada PDF</span>
+                        )}
                         <button 
-                          onClick={() => handleDownloadPdf(item.spkFile)}
-                          title="Klik untuk download PDF SPK"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl text-[11px] font-medium cursor-pointer transition-all shadow-sm"
+                          onClick={() => handleOpenEdit(item)}
+                          title="Ganti / Edit SPK PDF"
+                          className="opacity-60 hover:opacity-100 text-amber-400 p-1 rounded hover:bg-slate-800 cursor-pointer"
                         >
-                          <FileText className="w-3.5 h-3.5" /> 
-                          <span>{item.spkFile}</span>
-                          <Download className="w-3 h-3 ml-1 text-blue-300 animate-pulse" />
+                          <Edit3 className="w-3.5 h-3.5" />
                         </button>
-                      ) : (
-                        <span className="text-slate-500 italic">Belum ada PDF</span>
-                      )}
+                      </div>
 
                       <button 
                         onClick={() => handleDelete(item.id)}
