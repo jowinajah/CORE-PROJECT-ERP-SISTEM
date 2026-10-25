@@ -15,6 +15,7 @@ import FinanceViews from './components/FinanceViews';
 import HrdViews from './components/HrdViews';
 import MarketingViews from './components/MarketingViews';
 import RantaiProduksiView from './components/RantaiProduksiView';
+import VisiMisiView from './components/VisiMisiView';
 import { 
   LayoutDashboard, 
   Users, 
@@ -62,7 +63,8 @@ import {
   LogOut,
   Bell,
   MessageSquare,
-  Send
+  Send,
+  Target
 } from 'lucide-react';
 
 export default function App() {
@@ -85,7 +87,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [topMenuOpen, setTopMenuOpen] = useState(false);
 
-  // State untuk Modal Notifikasi & Widget Live Chat Mengambang
+  // State untuk Modal Notifikasi & Widget Live Chat Mengambang di Pojok Kiri Bawah
   const [showNotifModal, setShowNotifModal] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
@@ -182,7 +184,7 @@ export default function App() {
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.main ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
             </button>
             
-            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-36 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -190,6 +192,14 @@ export default function App() {
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" /> Dashboard Overview
+              </button>
+              <button
+                onClick={() => { setActiveTab('visi-misi'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'visi-misi' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Target className="w-4 h-4 text-amber-400" /> Visi & Misi CORE
               </button>
             </div>
           </div>
@@ -700,6 +710,7 @@ export default function App() {
         <main className="flex-1 p-4 sm:p-8">
           <div className="max-w-7xl mx-auto">
             {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
+            {activeTab === 'visi-misi' && <VisiMisiView />}
             {activeTab === 'rantai-produksi' && <RantaiProduksiView />}
             {activeTab === 'crm' && <ClientCRM />}
             {activeTab === 'po-project' && <PoProjectView />}
