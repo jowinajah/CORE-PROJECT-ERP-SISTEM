@@ -13,6 +13,7 @@ import MitraViews from './components/MitraViews';
 import FinanceViews from './components/FinanceViews';
 import HrdViews from './components/HrdViews';
 import MarketingViews from './components/MarketingViews';
+import RantaiProduksiView from './components/RantaiProduksiView';
 import { 
   LayoutDashboard, 
   Users, 
@@ -90,12 +91,10 @@ export default function App() {
       {/* Header Mobile */}
       <div className="md:hidden bg-slate-900 border-b border-amber-500/20 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <img 
-            src="/logo.png" 
-            alt="Logo" 
-            className="w-8 h-8 object-contain rounded-lg border border-amber-500/40 bg-slate-950 p-0.5"
-            onError={(e)=>{e.target.style.display='none';}} 
-          />
+          {/* Logo Geometris Emas Kustom */}
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/30 border border-amber-100 transform rotate-45">
+            <div className="w-4 h-4 bg-slate-950 transform -rotate-45"></div>
+          </div>
           <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-sm tracking-widest uppercase">
             CORE PROJECT
           </span>
@@ -113,15 +112,15 @@ export default function App() {
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header dengan Logo Asli & Badge ERP Workshop (Sesuai Referensi Gambar 1) */}
+        {/* Brand Header dengan Logo Geometris Emas & Badge ERP Workshop */}
         <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img 
-              src="/logo.png" 
-              alt="CORE Project Logo" 
-              className="w-10 h-10 object-contain rounded-xl border border-amber-500/40 bg-slate-950 p-1 shadow-md shadow-amber-500/20"
-              onError={(e)=>{e.target.style.display='none';}} 
-            />
+          <div className="flex items-center gap-3">
+            {/* Logo Geometris Emas Metalik Kustom */}
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 border border-amber-100 flex-shrink-0 transform rotate-45">
+              <div className="w-4 h-4 bg-slate-950 rounded-sm transform -rotate-45 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+              </div>
+            </div>
             <div>
               <h1 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 text-xs tracking-wider uppercase">
                 CORE PROJECT
@@ -169,9 +168,14 @@ export default function App() {
             </button>
 
             <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.workshop ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-              <div className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs text-slate-400 hover:bg-slate-800/40 transition-colors cursor-pointer">
+              <button
+                onClick={() => { setActiveTab('rantai-produksi'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'rantai-produksi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
                 <Layers className="w-4 h-4 text-amber-400" /> Rantai Estafet Produksi
-              </div>
+              </button>
               <button
                 onClick={() => { setActiveTab('po-project'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -544,18 +548,18 @@ export default function App() {
       {/* MAIN CONTENT AREA DENGAN TOP ACTION BAR */}
       <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto">
         
-        {/* TOP ACTION BAR (SET BAR UNTUK PENAMBAHAN FITUR / SHORTCUT SESUAI REFERENSI GAMBAR 2) */}
+        {/* TOP ACTION BAR (SET BAR UNTUK PENAMBAHAN FITUR / SHORTCUT) */}
         <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md">
           <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
             <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
               <Zap className="w-3.5 h-3.5" /> Quick Workshop:
             </span>
             <button 
-              onClick={() => setActiveTab('dashboard')} 
+              onClick={() => setActiveTab('rantai-produksi')} 
               className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
             >
               <span>⚡ Rantai Estafet</span> 
-              <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded text-[10px] font-bold">14 Task</span>
+              <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded text-[10px] font-bold">7 Tahap</span>
             </button>
             <button 
               onClick={() => setActiveTab('hrd-faceid')} 
@@ -586,6 +590,7 @@ export default function App() {
         <main className="flex-1 p-4 sm:p-8">
           <div className="max-w-7xl mx-auto">
             {activeTab === 'dashboard' && <ExecutiveOwnerSuite />}
+            {activeTab === 'rantai-produksi' && <RantaiProduksiView />}
             {activeTab === 'crm' && <ClientCRM />}
             {activeTab === 'po-project' && <PoProjectView />}
             {activeTab === 'payment' && <PaymentProofView />}
