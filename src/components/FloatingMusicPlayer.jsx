@@ -169,4 +169,48 @@ export default function FloatingMusicPlayer() {
             </button>
             <button 
               onClick={handleNext}
-              className="p-2 text-slate-300 hover:text-amber
+              className="p-2 text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
+              title="Lagu Selanjutnya"
+            >
+              <SkipForward className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* PENGATUR VOLUME & PLAYLIST ALBUM PERUNGGU */}
+          <div className="pt-2 border-t border-slate-800 space-y-3">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setIsMuted(!isMuted)} className="text-slate-400 hover:text-white cursor-pointer">
+                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
+              </button>
+              <input 
+                type="range" 
+                min="0" 
+                max="1" 
+                step="0.01"
+                value={isMuted ? 0 : volume}
+                onChange={(e) => { setVolume(parseFloat(e.target.value)); setIsMuted(false); }}
+                className="w-full accent-amber-400 bg-slate-950 h-1.5 rounded-lg cursor-pointer"
+              />
+            </div>
+
+            {/* DAFTAR TRACK PERUNGGU */}
+            <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Album Memorandum - Perunggu:</p>
+              {playlist.map((track, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => { setCurrentTrackIndex(idx); setIsPlaying(true); }}
+                  className={`w-full text-left px-3 py-1.5 rounded-xl text-[11px] flex items-center justify-center justify-between cursor-pointer transition-all ${currentTrackIndex === idx ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold' : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'}`}
+                >
+                  <span className="truncate">{idx + 1}. {track.title}</span>
+                  {currentTrackIndex === idx && isPlaying && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>}
+                </button>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+}
