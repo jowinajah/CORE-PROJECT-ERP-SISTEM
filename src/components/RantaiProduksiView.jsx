@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, Search, Plus, Package, Edit3, Trash2, FileText, Upload, Check } from 'lucide-react';
+import { Layers, Search, Plus, Package, Edit3, Trash2, FileText, Upload, Check, Download } from 'lucide-react';
 
 export default function RantaiProduksiView() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,7 +51,7 @@ export default function RantaiProduksiView() {
   };
 
   const handleDelete = (id) => {
-    if (confirm('Yakin ingin menghapus data PO ini?')) {
+    if (confirm('Yakin ingin menghapus data PO dan SPK ini?')) {
       setProductionList(productionList.filter(item => item.id !== id));
     }
   };
@@ -61,6 +61,17 @@ export default function RantaiProduksiView() {
     if (file) {
       setCurrentPo({ ...currentPo, spkFile: file.name });
     }
+  };
+
+  // Fungsi simulasi download file PDF SPK
+  const handleDownloadPdf = (fileName) => {
+    const element = document.createElement("a");
+    const file = new Blob([`SURAT PERINTAH KERJA (SPK) - CORE PROJECT\nFile: ${fileName}\nStatus: Aktif\n\nDetail:\nDokumen SPK resmi workshop konveksi dan percetakan CORE Project.`], {type: 'application/pdf'});
+    element.href = URL.createObjectURL(file);
+    element.download = fileName || "SPK_Produksi.pdf";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   const filteredList = productionList.filter(item => 
@@ -79,7 +90,7 @@ export default function RantaiProduksiView() {
             <Layers className="w-4 h-4" /> Modul Workshop CORE Project
           </div>
           <h1 className="text-2xl font-bold text-white">Rantai Estafet Produksi & SPK</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta lampiran dokumen SPK PDF.</p>
+          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta download file SPK PDF.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
@@ -190,7 +201,7 @@ export default function RantaiProduksiView() {
         </div>
       )}
 
-      {/* TABEL DAFTAR PO & SPK */}
+      {/* TABEL DAFTAR PO & SPK DENGAN AKSI DI TIAP KOLOM */}
       <div className="bg-slate-900/80 border border-amber-500/20 rounded-2xl p-6 shadow-sm space-y-4">
         <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
           <Package className="w-5 h-5" /> Daftar Tracking Status Produksi & SPK ({filteredList.length} PO)
@@ -201,57 +212,110 @@ export default function RantaiProduksiView() {
             <thead className="bg-slate-800/50 text-xs uppercase text-slate-400">
               <tr>
                 <th className="px-4 py-3">No. PO / SPK</th>
-                <th className="px-4 py-3">Klien & Jenis Pakaian</th>
-                <th className="px-4 py-3">Jumlah</th>
-                <th className="px-4 py-3">Deadline</th>
-                <th className="px-4 py-3">Proses</th>
-                <th className="px-4 py-3">Dokumen SPK (PDF)</th>
-                <th className="px-4 py-3 text-center">Aksi (Edit / Hapus)</th>
+                <th className="px-4 py-3">Klien & Jenis Pakaian (Edit)</th>
+                <th className="px-4 py-3">Jumlah (Edit)</th>
+                <th className="px-4 py-3">Deadline (Edit)</th>
+                <th className="px-4 py-3">Proses (Edit)</th>
+                <th className="px-4 py-3">Dokumen SPK (PDF) & Aksi Hapus</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-xs">
               {filteredList.map((item, idx) => (
                 <tr key={idx} className="hover:bg-slate-800/30">
                   <td className="px-4 py-3 font-bold text-amber-400">{item.id}</td>
+                  
+                  {/* Kolom Klien & Jenis Pakaian + Tombol Edit Cepat */}
                   <td className="px-4 py-3">
-                    <p className="font-semibold text-white">{item.client}</p>
-                    <p className="text-slate-400 text-[11px]">{item.jenis}</p>
+                    <div className="flex items-center justify-between group">
+                      <div>
+                        <p className="font-semibold text-white">{item.client}</p>
+                        <p className="text-slate-400 text-[11px]">{item.jenis}</p>
+                      </div>
+                      <button 
+                        onClick={() => handleOpenEdit(item)} 
+                        title="Edit Klien & Jenis"
+                        className="opacity-60 hover:opacity-100 text-amber-400 p-1 rounded hover:bg-slate-800 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 font-bold text-emerald-400">{item.qty}</td>
-                  <td className="px-4 py-3 text-slate-300">{item.deadline}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-3 py-1 rounded-full font-bold text-[11px] bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                      {item.stage}
-                    </span>
+
+                  {/* Kolom Jumlah + Tombol Edit Cepat */}
+                  <td className="px-4 py-3 font-bold text-emerald-400">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{item.qty}</span>
+                      <button 
+                        onClick={() => handleOpenEdit(item)} 
+                        title="Edit Jumlah"
+                        className="opacity-60 hover:opacity-100 text-amber-400 p-1 rounded hover:bg-slate-800 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
+
+                  {/* Kolom Deadline + Tombol Edit Cepat */}
+                  <td className="px-4 py-3 text-slate-300">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{item.deadline}</span>
+                      <button 
+                        onClick={() => handleOpenEdit(item)} 
+                        title="Edit Deadline"
+                        className="opacity-60 hover:opacity-100 text-amber-400 p-1 rounded hover:bg-slate-800 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* Kolom Proses + Tombol Edit Cepat */}
                   <td className="px-4 py-3">
-                    {item.spkFile ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[11px] font-medium">
-                        <FileText className="w-3.5 h-3.5" /> {item.spkFile}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-3 py-1 rounded-full font-bold text-[11px] bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        {item.stage}
                       </span>
-                    ) : (
-                      <span className="text-slate-500 italic">Belum ada PDF</span>
-                    )}
+                      <button 
+                        onClick={() => handleOpenEdit(item)} 
+                        title="Edit Proses"
+                        className="opacity-60 hover:opacity-100 text-amber-400 p-1 rounded hover:bg-slate-800 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-center space-x-2">
-                    <button 
-                      onClick={() => handleOpenEdit(item)}
-                      className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg text-xs font-bold cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(item.id)}
-                      className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Hapus
-                    </button>
+
+                  {/* Kolom Dokumen SPK (Klik untuk Download) & Hapus */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      {item.spkFile ? (
+                        <button 
+                          onClick={() => handleDownloadPdf(item.spkFile)}
+                          title="Klik untuk download PDF SPK"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl text-[11px] font-medium cursor-pointer transition-all shadow-sm"
+                        >
+                          <FileText className="w-3.5 h-3.5" /> 
+                          <span>{item.spkFile}</span>
+                          <Download className="w-3 h-3 ml-1 text-blue-300 animate-pulse" />
+                        </button>
+                      ) : (
+                        <span className="text-slate-500 italic">Belum ada PDF</span>
+                      )}
+
+                      <button 
+                        onClick={() => handleDelete(item.id)}
+                        title="Hapus PO & SPK"
+                        className="p-1.5 text-rose-400 hover:text-white hover:bg-rose-500/80 bg-rose-500/10 border border-rose-500/20 rounded-xl transition-all cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
               {filteredList.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="text-center py-6 text-slate-500">Tidak ada data PO yang sesuai dengan pencarian.</td>
+                  <td colSpan="6" className="text-center py-6 text-slate-500">Tidak ada data PO yang sesuai dengan pencarian.</td>
                 </tr>
               )}
             </tbody>
