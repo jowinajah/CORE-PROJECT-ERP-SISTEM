@@ -59,11 +59,13 @@ import {
   Menu,
   X,
   Zap,
-  LogOut
+  LogOut,
+  Bell,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 
 export default function App() {
-  // State user login dengan localStorage agar tidak hilang saat refresh
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem('core_current_user');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -81,6 +83,23 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [topMenuOpen, setTopMenuOpen] = useState(false);
+
+  // State untuk Modal Notifikasi & Live Chat
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'Marketing', text: 'Min, PO baru untuk Kemeja KKN UIN sudah di-input ya.', time: '14:00' },
+    { sender: 'Produksi', text: 'Siap, bahan kain Nagata Drill sedang dipotong di meja cutting.', time: '14:05' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+
+  const handleSendChat = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    setChatMessages([...chatMessages, { sender: currentUser.name, text: chatInput, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }]);
+    setChatInput('');
+  };
 
   // State untuk mengontrol Accordion Menu
   const [openSections, setOpenSections] = useState({
@@ -101,13 +120,12 @@ export default function App() {
     }));
   };
 
-  // Jika belum login, tampilkan halaman login
   if (!currentUser) {
     return <LoginView onLogin={handleLogin} />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans relative">
       
       {/* Header Mobile */}
       <div className="md:hidden bg-slate-900 border-b border-amber-500/20 p-4 flex items-center justify-between sticky top-0 z-50">
@@ -132,7 +150,7 @@ export default function App() {
         fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Brand Header dengan Logo Geometris Emas & Badge ERP Workshop */}
+        {/* Brand Header */}
         <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 border border-amber-100 flex-shrink-0 transform rotate-45">
@@ -572,9 +590,50 @@ export default function App() {
       {/* MAIN CONTENT AREA DENGAN TOP ACTION BAR */}
       <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto">
         
-        {/* TOP ACTION BAR (SET BAR UNTUK PENAMBAHAN FITUR / SHORTCUT) */}
+        {/* TOP ACTION BAR DENGAN TOMBOL GARIS TIGA (MENU) */}
         <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md">
-          <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+          <div className="flex items-center gap-3 overflow-x-auto py-1 scrollbar-none">
+            
+            {/* Tombol Garis Tiga (Menu Dropdown untuk Logout, Notifikasi, Live Chat) */}
+            <div className="relative">
+              <button 
+                onClick={() => setTopMenuOpen(!topMenuOpen)}
+                className="p-2 bg-slate-950 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl flex items-center justify-center cursor-pointer transition-all shadow-sm"
+                title="Menu Cepat"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+
+              {/* Dropdown Menu Garis Tiga */}
+              {topMenuOpen && (
+                <div className="absolute left-0 mt-2 w-56 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl py-2 z-50 space-y-1">
+                  <div className="px-4 py-2 border-b border-slate-800 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                    Menu Cepat Perusahaan
+                  </div>
+                  <button 
+                    onClick={() => { setShowNotifModal(true); setTopMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <Bell className="w-4 h-4 text-amber-400" /> Notifikasi Sistem
+                  </button>
+                  <button 
+                    onClick={() => { setShowChatModal(true); setTopMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <MessageSquare className="w-4 h-4 text-emerald-400" /> Live Chat Antar Divisi
+                  </button>
+                  <div className="border-t border-slate-800 pt-1">
+                    <button 
+                      onClick={() => { handleLogout(); setTopMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5 cursor-pointer font-semibold"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-400" /> Logout / Keluar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
               <Zap className="w-3.5 h-3.5" /> Quick Workshop:
             </span>
@@ -609,6 +668,82 @@ export default function App() {
             <span>👑 {currentUser.name} ({currentUser.role})</span>
           </div>
         </header>
+
+        {/* MODAL NOTIFIKASI */}
+        {showNotifModal && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-amber-400" /> Notifikasi Sistem & Workshop
+                </h3>
+                <button onClick={() => setShowNotifModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-3 text-xs">
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
+                  <p className="font-bold text-white">SPK PO-001 Telah Diperbarui</p>
+                  <p className="text-slate-400">Status produksi beralih ke tahap Sewing/Jahit.</p>
+                  <span className="text-[10px] text-amber-400">10 menit yang lalu</span>
+                </div>
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
+                  <p className="font-bold text-white">Absensi Karyawan Harian</p>
+                  <p className="text-slate-400">Semua pegawai lantai produksi telah melakukan Face ID.</p>
+                  <span className="text-[10px] text-amber-400">1 jam yang lalu</span>
+                </div>
+              </div>
+              <div className="flex justify-end pt-2">
+                <button onClick={() => setShowNotifModal(false)} className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer">
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL LIVE CHAT ANTAR DIVISI */}
+        {showChatModal && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-lg w-full shadow-2xl flex flex-col h-[500px]">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-emerald-400" /> Live Chat Antar Divisi CORE Project
+                </h3>
+                <button onClick={() => setShowChatModal(false)} className="text-slate-400 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Box Chat Messages */}
+              <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+                {chatMessages.map((msg, index) => (
+                  <div key={index} className={`p-3 rounded-2xl text-xs space-y-1 ${msg.sender === currentUser.name ? 'bg-amber-500/15 border border-amber-500/30 ml-8' : 'bg-slate-950 border border-slate-800 mr-8'}`}>
+                    <div className="flex justify-between items-center text-[10px] text-amber-400 font-bold">
+                      <span>{msg.sender}</span>
+                      <span className="text-slate-500">{msg.time}</span>
+                    </div>
+                    <p className="text-white">{msg.text}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Form Input Chat */}
+              <form onSubmit={handleSendChat} className="flex gap-2 pt-2 border-t border-slate-800">
+                <input 
+                  type="text" 
+                  placeholder="Ketik pesan antar divisi..." 
+                  value={chatInput} 
+                  onChange={(e) => setChatInput(e.target.value)}
+                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+                />
+                <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-1 cursor-pointer">
+                  <Send className="w-3.5 h-3.5" /> Kirim
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* KONTEN UTAMA */}
         <main className="flex-1 p-4 sm:p-8">
