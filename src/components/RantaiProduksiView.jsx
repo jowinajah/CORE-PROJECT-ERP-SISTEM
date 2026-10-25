@@ -4,12 +4,12 @@ import { Layers, Search, Plus, Package, Edit3, Trash2, FileText, Upload, Check, 
 export default function RantaiProduksiView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [productionList, setProductionList] = useState([
-    { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Sewing/Jahit', qty: '120 Pcs', deadline: '2026-11-05', spkFile: 'SPK_KKN_UIN.pdf' },
-    { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Selesai', qty: '45 Pcs', deadline: '2026-10-30', spkFile: 'SPK_Kopi_Senja.pdf' },
-    { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02', spkFile: 'SPK_XRider.pdf' },
-    { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10', spkFile: 'SPK_Textilindo.pdf' },
-    { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28', spkFile: 'SPK_Distro_BDG.pdf' },
-    { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20', spkFile: 'SPK_Sman1.pdf' },
+    { id: 'PO-001', client: 'Himpunan Mahasiswa UIN Bandung', jenis: 'Kemeja KKN (Nagata Drill)', stage: 'Sewing/Jahit', qty: '120 Pcs', deadline: '2026-11-05', spkFile: 'SPK_KKN_UIN.pdf', spkUrl: null },
+    { id: 'PO-002', client: 'Cafe Kopi Senja', jenis: 'Apron & Barista Shirt', stage: 'Selesai', qty: '45 Pcs', deadline: '2026-10-30', spkFile: 'SPK_Kopi_Senja.pdf', spkUrl: null },
+    { id: 'PO-003', client: 'X-Rider Community', jenis: 'Jersey Sublimasi Fullprint', stage: 'Bordir/Sablon/Sublimasi', qty: '80 Pcs', deadline: '2026-11-02', spkFile: 'SPK_XRider.pdf', spkUrl: null },
+    { id: 'PO-004', client: 'PT Textilindo Maju', jenis: 'Seragam Lapangan Tactical', stage: 'Sewing/Jahit', qty: '200 Pcs', deadline: '2026-11-10', spkFile: 'SPK_Textilindo.pdf', spkUrl: null },
+    { id: 'PO-005', client: 'Distro Streetwear BDG', jenis: 'Oversized Boxy Hoodie', stage: 'Quality Control', qty: '60 Pcs', deadline: '2026-10-28', spkFile: 'SPK_Distro_BDG.pdf', spkUrl: null },
+    { id: 'PO-006', client: 'Sman 1 Cimahi', jenis: 'Jaket Angkatan', stage: 'Selesai', qty: '150 Pcs', deadline: '2026-10-20', spkFile: 'SPK_Sman1.pdf', spkUrl: null },
   ]);
 
   const stages = [
@@ -24,11 +24,11 @@ export default function RantaiProduksiView() {
 
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentPo, setCurrentPo] = useState({ id: '', client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '' });
+  const [currentPo, setCurrentPo] = useState({ id: '', client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '', spkUrl: null });
 
   const handleOpenAdd = () => {
     setIsEditMode(false);
-    setCurrentPo({ id: `PO-00${productionList.length + 1}`, client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '' });
+    setCurrentPo({ id: `PO-00${productionList.length + 1}`, client: '', jenis: '', stage: 'List PO & Jenis', qty: '', deadline: '', spkFile: '', spkUrl: null });
     setShowModal(true);
   };
 
@@ -56,22 +56,34 @@ export default function RantaiProduksiView() {
     }
   };
 
+  // Menangkap file PDF asli yang di-upload
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setCurrentPo({ ...currentPo, spkFile: file.name });
+      const fileUrl = URL.createObjectURL(file);
+      setCurrentPo({ ...currentPo, spkFile: file.name, spkUrl: fileUrl });
     }
   };
 
-  // Fungsi simulasi download file PDF SPK
-  const handleDownloadPdf = (fileName) => {
-    const element = document.createElement("a");
-    const file = new Blob([`SURAT PERINTAH KERJA (SPK) - CORE PROJECT\nFile: ${fileName}\nStatus: Aktif\n\nDetail:\nDokumen SPK resmi workshop konveksi dan percetakan CORE Project.`], {type: 'application/pdf'});
-    element.href = URL.createObjectURL(file);
-    element.download = fileName || "SPK_Produksi.pdf";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  // Fungsi download file PDF asli
+  const handleDownloadPdf = (item) => {
+    if (item.spkUrl) {
+      const element = document.createElement("a");
+      element.href = item.spkUrl;
+      element.download = item.spkFile || "SPK_Produksi.pdf";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    } else {
+      // Jika data bawaan awal yang belum punya URL file asli, buatkan file PDF contoh yang valid
+      const element = document.createElement("a");
+      const file = new Blob([`%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /MediaBox [0 0 612 792] /Contents 4 0 R >>\nendobj\n4 0 obj\n<< /Length 44 >>\nstream\nBT /F1 24 Tf 100 700 Td (SURAT PERINTAH KERJA: ${item.id} - ${item.client}) Tj ET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n000000000.0 00000 n \n0000000096 00000 n \n0000000155 00000 n \n0000000282 00000 n \ntrailer\n<< /Root 1 0 R /Size 5 >>\nstartofxref\n387\n%%EOF`], {type: 'application/pdf'});
+      element.href = URL.createObjectURL(file);
+      element.download = item.spkFile || "SPK_Produksi.pdf";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
   };
 
   const filteredList = productionList.filter(item => 
@@ -90,7 +102,7 @@ export default function RantaiProduksiView() {
             <Layers className="w-4 h-4" /> Modul Workshop CORE Project
           </div>
           <h1 className="text-2xl font-bold text-white">Rantai Estafet Produksi & SPK</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta download file SPK PDF.</p>
+          <p className="text-slate-400 text-sm mt-1">Kelola data klien, jenis pakaian, jumlah, deadline, proses, serta download file SPK PDF asli.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
@@ -202,7 +214,7 @@ export default function RantaiProduksiView() {
         </div>
       )}
 
-      {/* TABEL DAFTAR PO & SPK DENGAN AKSI DI TIAP KOLOM */}
+      {/* TABEL DAFTAR PO & SPK */}
       <div className="bg-slate-900/80 border border-amber-500/20 rounded-2xl p-6 shadow-sm space-y-4">
         <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
           <Package className="w-5 h-5" /> Daftar Tracking Status Produksi & SPK ({filteredList.length} PO)
@@ -225,7 +237,7 @@ export default function RantaiProduksiView() {
                 <tr key={idx} className="hover:bg-slate-800/30">
                   <td className="px-4 py-3 font-bold text-amber-400">{item.id}</td>
                   
-                  {/* Kolom Klien & Jenis Pakaian + Tombol Edit Cepat */}
+                  {/* Klien & Jenis */}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-between group">
                       <div>
@@ -242,7 +254,7 @@ export default function RantaiProduksiView() {
                     </div>
                   </td>
 
-                  {/* Kolom Jumlah + Tombol Edit Cepat */}
+                  {/* Jumlah */}
                   <td className="px-4 py-3 font-bold text-emerald-400">
                     <div className="flex items-center justify-between gap-2">
                       <span>{item.qty}</span>
@@ -256,7 +268,7 @@ export default function RantaiProduksiView() {
                     </div>
                   </td>
 
-                  {/* Kolom Deadline + Tombol Edit Cepat */}
+                  {/* Deadline */}
                   <td className="px-4 py-3 text-slate-300">
                     <div className="flex items-center justify-between gap-2">
                       <span>{item.deadline}</span>
@@ -270,7 +282,7 @@ export default function RantaiProduksiView() {
                     </div>
                   </td>
 
-                  {/* Kolom Proses + Tombol Edit Cepat */}
+                  {/* Proses */}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="px-3 py-1 rounded-full font-bold text-[11px] bg-amber-500/15 text-amber-300 border border-amber-500/30">
@@ -286,13 +298,13 @@ export default function RantaiProduksiView() {
                     </div>
                   </td>
 
-                  {/* Kolom Dokumen SPK (Klik untuk Download/Edit) & Hapus */}
+                  {/* Dokumen SPK & Hapus */}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
                         {item.spkFile ? (
                           <button 
-                            onClick={() => handleDownloadPdf(item.spkFile)}
+                            onClick={() => handleDownloadPdf(item)}
                             title="Klik untuk download PDF SPK"
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl text-[11px] font-medium cursor-pointer transition-all shadow-sm"
                           >
