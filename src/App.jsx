@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LoginView from './components/LoginView';
 import ExecutiveOwnerSuite from './components/ExecutiveOwnerSuite';
 import ClientCRM from './components/ClientCRM';
 import NotesView from './components/NotesView';
@@ -19,8 +20,6 @@ import {
   Users, 
   Layers, 
   Video, 
-  Palette, 
-  MessageSquareQuote, 
   NotebookPen,
   Bot,
   BellRing,
@@ -59,10 +58,27 @@ import {
   ChevronDown,
   Menu,
   X,
-  Zap
+  Zap,
+  LogOut
 } from 'lucide-react';
 
 export default function App() {
+  // State user login dengan localStorage agar tidak hilang saat refresh
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem('core_current_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('core_current_user', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('core_current_user');
+  };
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -85,13 +101,17 @@ export default function App() {
     }));
   };
 
+  // Jika belum login, tampilkan halaman login
+  if (!currentUser) {
+    return <LoginView onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans">
       
       {/* Header Mobile */}
       <div className="md:hidden bg-slate-900 border-b border-amber-500/20 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          {/* Logo Geometris Emas Kustom */}
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/30 border border-amber-100 transform rotate-45">
             <div className="w-4 h-4 bg-slate-950 transform -rotate-45"></div>
           </div>
@@ -115,7 +135,6 @@ export default function App() {
         {/* Brand Header dengan Logo Geometris Emas & Badge ERP Workshop */}
         <div className="p-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* Logo Geometris Emas Metalik Kustom */}
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 border border-amber-100 flex-shrink-0 transform rotate-45">
               <div className="w-4 h-4 bg-slate-950 rounded-sm transform -rotate-45 flex items-center justify-center">
                 <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
@@ -529,19 +548,24 @@ export default function App() {
 
         </div>
 
-        {/* Profil BOS JOW */}
-        <div className="p-4 border-t border-amber-500/20 bg-slate-950/60">
+        {/* Profil & Logout BOS JOW */}
+        <div className="p-4 border-t border-amber-500/20 bg-slate-950/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/40">
-              BJ
+              {currentUser.name.charAt(0)}
             </div>
             <div>
-              <p className="text-xs font-semibold text-white">BOS JOW</p>
-              <p className="text-[10px] text-amber-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Gold Elegant Active
-              </p>
+              <p className="text-xs font-semibold text-white">{currentUser.name}</p>
+              <p className="text-[10px] text-amber-400">{currentUser.role}</p>
             </div>
           </div>
+          <button 
+            onClick={handleLogout}
+            title="Keluar / Logout"
+            className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </aside>
 
@@ -582,7 +606,7 @@ export default function App() {
           </div>
 
           <div className="hidden lg:flex items-center gap-2 text-xs text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl whitespace-nowrap">
-            <span>👑 BOS JOW (Executive Suite)</span>
+            <span>👑 {currentUser.name} ({currentUser.role})</span>
           </div>
         </header>
 
