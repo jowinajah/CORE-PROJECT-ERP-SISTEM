@@ -552,3 +552,14 @@ export default function App() {
           {activeTab === 'zoom' && <ZoomView />}
           {activeTab === 'ai-assistant' && <AiAssistant />}
           {activeTab === 'boss-notes' && <BossNotesRealtime />}
+          {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
+          {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
+          {activeTab.startsWith('finance-') && <FinanceViews tab={activeTab} />}
+          {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
+          {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
+        </div>
+      </main>
+
+    </div>
+  );
+}
