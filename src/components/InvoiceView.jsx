@@ -309,4 +309,120 @@ export default function InvoiceView() {
                     <td className="px-4 py-3 text-right font-bold text-emerald-400">{formatRupiah(inv.dpAmount)}</td>
                     <td className="px-4 py-3 text-right font-bold text-rose-400">{formatRupiah(sisaPelunasan)}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${inv.status.includes('Lunas') ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                        {inv.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center space-x-1">
+                      <button onClick={() => setPreviewInvoice(inv)} title="Lihat & Cetak Nota Profesional" className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 rounded-lg text-[10px] font-bold cursor-pointer inline-flex items-center gap-1">
+                        <Printer className="w-3.5 h-3.5" /> Nota
+                      </button>
+                      <button onClick={() => handleOpenEdit(inv)} title="Edit" className="p-1.5 text-slate-400 hover:text-amber-400 rounded hover:bg-slate-800 cursor-pointer inline-block"><Edit3 className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(inv.id)} title="Hapus" className="p-1.5 text-rose-400 hover:text-white rounded hover:bg-rose-500/20 cursor-pointer inline-block"><Trash2 className="w-4 h-4" /></button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* MODAL TAMBAH/EDIT INVOICE DENGAN MULTI-ITEM */}
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-amber-400">{isEditMode ? 'Edit Tagihan Invoice' : 'Buat Invoice Multi-Item Baru'}</h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. Invoice</label>
+                <input type="text" required value={currentInv.id} onChange={e => setCurrentInv({...currentInv, id: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Tanggal</label>
+                <input type="date" required value={currentInv.date} onChange={e => setCurrentInv({...currentInv, date: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Konsumen / Klien</label>
+              <input type="text" required placeholder="Contoh: PT Makmur Jaya" value={currentInv.client} onChange={e => setCurrentInv({...currentInv, client: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+            </div>
+
+            {/* DAFTAR ITEM / MODEL PESANAN */}
+            <div className="space-y-3 border-t border-slate-800 pt-3">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold text-amber-400 uppercase tracking-wider">Rincian Jenis Produk / Model Pesanan:</label>
+                <button 
+                  type="button" 
+                  onClick={handleAddItemRow}
+                  className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold cursor-pointer flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" /> Tambah Model Lain
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {currentInv.items.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div className="flex-1">
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="Nama Produk / Model (Cth: Kemeja PDH)" 
+                        value={item.description} 
+                        onChange={e => handleItemChange(index, 'description', e.target.value)} 
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white"
+                      />
+                    </div>
+                    <div className="w-20">
+                      <input 
+                        type="number" 
+                        required 
+                        placeholder="Qty" 
+                        value={item.qty} 
+                        onChange={e => handleItemChange(index, 'qty', e.target.value)} 
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white text-center"
+                      />
+                    </div>
+                    <div className="w-28">
+                      <input 
+                        type="number" 
+                        required 
+                        placeholder="Harga/Pcs" 
+                        value={item.price} 
+                        onChange={e => handleItemChange(index, 'price', e.target.value)} 
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white text-right"
+                      />
+                    </div>
+                    {currentInv.items.length > 1 && (
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveItemRow(index)}
+                        className="p-1.5 text-rose-400 hover:bg-rose-500/20 rounded-lg cursor-pointer"
+                        title="Hapus Baris"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-slate-800 pt-3">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">DP / Uang Muka yang Dibayarkan (Rp)</label>
+              <input type="number" required placeholder="5000000" value={currentInv.dpAmount} onChange={e => setCurrentInv({...currentInv, dpAmount: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-slate-800 text-xs rounded-xl cursor-pointer">Batal</button>
+              <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1"><Check className="w-4 h-4" /> Simpan Invoice</button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
