@@ -72,7 +72,8 @@ import {
   Send,
   Target,
   ShieldCheck,
-  Navigation
+  Navigation,
+  Lock
 } from 'lucide-react';
 
 export default function App() {
@@ -109,6 +110,40 @@ export default function App() {
     if (!chatInput.trim()) return;
     setChatMessages([...chatMessages, { sender: currentUser.name, text: chatInput, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }]);
     setChatInput('');
+  };
+
+  // FUNGSI KONTROL HAK AKSES (SECURITY GUARD)
+  const handleProtectedTabNav = (tabKey) => {
+    if (!currentUser) return;
+
+    // Cek apakah user adalah Owner / BOS JOW (Akses Penuh Tanpa Batas)
+    const isOwner = currentUser.division === 'Executive' || currentUser.role.toLowerCase().includes('owner') || currentUser.name === 'Kang Fahmi';
+
+    if (!isOwner) {
+      // Jika akun berstatus Admin / Staf Office, batasi hanya ke Fitur Workshop dan Invoice & Tagihan DP
+      const isStaffAdminOrOffice = currentUser.role.toLowerCase().includes('admin') || currentUser.division === 'Div. Office';
+      
+      if (isStaffAdminOrOffice) {
+        const allowedTabsForAdmin = [
+          'dashboard', 
+          'rantai-produksi', 
+          'po-project', 
+          'payment', 
+          'meeting-libur', 
+          'notes', 
+          'zoom', 
+          'finance-invoice'
+        ];
+
+        if (!allowedTabsForAdmin.includes(tabKey)) {
+          alert(`🚫 AKSES DITOLAK!\n\nAkun "${currentUser.name}" (${currentUser.role}) hanya diizinkan mengakses menu Fitur Workshop dan Invoice & Tagihan DP.`);
+          return;
+        }
+      }
+    }
+
+    setActiveTab(tabKey);
+    setSidebarOpen(false);
   };
 
   // State untuk mengontrol Accordion Menu
@@ -194,7 +229,7 @@ export default function App() {
             
             <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.main ? 'max-h-36 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('dashboard')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'dashboard' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -202,7 +237,7 @@ export default function App() {
                 <LayoutDashboard className="w-4 h-4" /> Dashboard Overview
               </button>
               <button
-                onClick={() => { setActiveTab('visi-misi'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('visi-misi')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'visi-misi' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -224,7 +259,7 @@ export default function App() {
 
             <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.workshop ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('rantai-produksi'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('rantai-produksi')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'rantai-produksi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -232,7 +267,7 @@ export default function App() {
                 <Layers className="w-4 h-4 text-amber-400" /> Rantai Estafet Produksi
               </button>
               <button
-                onClick={() => { setActiveTab('po-project'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('po-project')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'po-project' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -240,7 +275,7 @@ export default function App() {
                 <FileSpreadsheet className="w-4 h-4 text-amber-400" /> PO PROJECT
               </button>
               <button
-                onClick={() => { setActiveTab('payment'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('payment')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'payment' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -248,7 +283,7 @@ export default function App() {
                 <Receipt className="w-4 h-4 text-amber-400" /> BUKTI PAYMENT
               </button>
               <button
-                onClick={() => { setActiveTab('meeting-libur'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('meeting-libur')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'meeting-libur' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -256,7 +291,7 @@ export default function App() {
                 <CalendarDays className="w-4 h-4 text-amber-400" /> MEETING & LIBUR
               </button>
               <button
-                onClick={() => { setActiveTab('notes'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('notes')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'notes' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -264,7 +299,7 @@ export default function App() {
                 <NotebookPen className="w-4 h-4 text-amber-400" /> Notes & Kegiatan Harian
               </button>
               <button
-                onClick={() => { setActiveTab('zoom'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('zoom')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'zoom' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -286,7 +321,7 @@ export default function App() {
 
             <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.finance ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('finance-pl'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('finance-pl')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'finance-pl' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -294,7 +329,7 @@ export default function App() {
                 <TrendingUp className="w-4 h-4 text-amber-400" /> Laba Rugi (P&L)
               </button>
               <button
-                onClick={() => { setActiveTab('finance-cashflow'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('finance-cashflow')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'finance-cashflow' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -302,7 +337,7 @@ export default function App() {
                 <ArrowLeftRight className="w-4 h-4 text-amber-400" /> Cashflow & Arus Kas
               </button>
               <button
-                onClick={() => { setActiveTab('finance-ledger'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('finance-ledger')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'finance-ledger' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -310,7 +345,7 @@ export default function App() {
                 <BookOpen className="w-4 h-4 text-amber-400" /> Accounting & Buku Kas
               </button>
               <button
-                onClick={() => { setActiveTab('finance-invoice'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('finance-invoice')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'finance-invoice' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -318,7 +353,7 @@ export default function App() {
                 <FileText className="w-4 h-4 text-amber-400" /> Invoice & Tagihan DP
               </button>
               <button
-                onClick={() => { setActiveTab('finance-ocr'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('finance-ocr')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'finance-ocr' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -340,7 +375,7 @@ export default function App() {
 
             <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.marketing ? 'max-h-56 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('marketing-reseller'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('marketing-reseller')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'marketing-reseller' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -348,7 +383,7 @@ export default function App() {
                 <Users className="w-4 h-4 text-amber-400" /> Reseller & Kemitraan
               </button>
               <button
-                onClick={() => { setActiveTab('marketing-content'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('marketing-content')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'marketing-content' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -356,7 +391,7 @@ export default function App() {
                 <Clapperboard className="w-4 h-4 text-amber-400" /> Content Creator Labs
               </button>
               <button
-                onClick={() => { setActiveTab('marketing-rekening'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('marketing-rekening')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'marketing-rekening' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -364,7 +399,7 @@ export default function App() {
                 <CreditCard className="w-4 h-4 text-amber-400" /> No Rekening Marketing
               </button>
               <button
-                onClick={() => { setActiveTab('marketing-ranking'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('marketing-ranking')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'marketing-ranking' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -386,7 +421,7 @@ export default function App() {
 
             <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.hrd ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('hrd-ats'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-ats')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-ats' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -394,7 +429,7 @@ export default function App() {
                 <UserPlus className="w-4 h-4 text-amber-400" /> Rekruitmen HRD ATS
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-faceid'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-faceid')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-faceid' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -402,7 +437,7 @@ export default function App() {
                 <ScanFace className="w-4 h-4 text-amber-400" /> Absensi Face ID
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-calendar'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-calendar')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-calendar' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -410,7 +445,7 @@ export default function App() {
                 <CalendarCheck className="w-4 h-4 text-amber-400" /> Kalender Kerja & Libur
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-overtime'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-overtime')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-overtime' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -418,7 +453,7 @@ export default function App() {
                 <Clock className="w-4 h-4 text-amber-400" /> Pengajuan Lembur
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-reimburse'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-reimburse')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-reimburse' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -426,7 +461,7 @@ export default function App() {
                 <ReceiptText className="w-4 h-4 text-amber-400" /> Klaim Reimburse
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-kpi'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-kpi')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-kpi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -434,7 +469,7 @@ export default function App() {
                 <Award className="w-4 h-4 text-amber-400" /> Penilaian KPI
               </button>
               <button
-                onClick={() => { setActiveTab('hrd-cashadvance'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('hrd-cashadvance')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'hrd-cashadvance' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -456,7 +491,7 @@ export default function App() {
 
             <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.mitra ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('mitra-factory'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('mitra-factory')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'mitra-factory' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -464,7 +499,7 @@ export default function App() {
                 <Building2 className="w-4 h-4 text-amber-400" /> Mitra Factory
               </button>
               <button
-                onClick={() => { setActiveTab('mitra-supplier'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('mitra-supplier')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'mitra-supplier' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -472,7 +507,7 @@ export default function App() {
                 <Truck className="w-4 h-4 text-amber-400" /> Mitra Supplier
               </button>
               <button
-                onClick={() => { setActiveTab('mitra-reseller'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('mitra-reseller')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'mitra-reseller' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -494,7 +529,7 @@ export default function App() {
 
             <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('ai-assistant'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('ai-assistant')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'ai-assistant' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -502,7 +537,7 @@ export default function App() {
                 <Bot className="w-4 h-4 text-amber-400" /> 1. Asisten BOS (AI & Suara)
               </button>
               <button
-                onClick={() => { setActiveTab('boss-notes'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('boss-notes')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'boss-notes' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -510,7 +545,7 @@ export default function App() {
                 <BellRing className="w-4 h-4 text-amber-400" /> 2. Catatan Realtime BOS
               </button>
               <button
-                onClick={() => { setActiveTab('crm'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('crm')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'crm' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -518,7 +553,7 @@ export default function App() {
                 <Users className="w-4 h-4 text-amber-400" /> 3. Database Konsumen & CRM
               </button>
               <button
-                onClick={() => { setActiveTab('premier-financial'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('premier-financial')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'premier-financial' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -526,7 +561,7 @@ export default function App() {
                 <ShieldCheck className="w-4 h-4 text-amber-400" /> 4. Strategi Finansial & HPP
               </button>
               <button
-                onClick={() => { setActiveTab('product-hpp-strategy'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('product-hpp-strategy')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'product-hpp-strategy' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -534,7 +569,7 @@ export default function App() {
                 <Target className="w-4 h-4 text-amber-400" /> 5. HPP & Target Produk
               </button>
               <button
-                onClick={() => { setActiveTab('user-management'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('user-management')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'user-management' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -542,7 +577,7 @@ export default function App() {
                 <Users className="w-4 h-4 text-amber-400" /> 6. Manajemen Akun Pengguna
               </button>
               <button
-                onClick={() => { setActiveTab('user-gps-tracking'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('user-gps-tracking')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'user-gps-tracking' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -564,7 +599,7 @@ export default function App() {
 
             <div className={`space-y-1 text-xs overflow-hidden transition-all duration-300 ease-in-out ${openSections.factory ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
-                onClick={() => { setActiveTab('factory-deadline'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-deadline')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-deadline' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -572,7 +607,7 @@ export default function App() {
                 <Calendar className="w-4 h-4 text-amber-400" /> Kalender Dateline
               </button>
               <button
-                onClick={() => { setActiveTab('factory-tracking'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-tracking')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-tracking' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -580,7 +615,7 @@ export default function App() {
                 <Activity className="w-4 h-4 text-amber-400" /> Tracking Proses
               </button>
               <button
-                onClick={() => { setActiveTab('factory-stock'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-stock')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-stock' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -588,7 +623,7 @@ export default function App() {
                 <Boxes className="w-4 h-4 text-amber-400" /> Stok Bahan Baku
               </button>
               <button
-                onClick={() => { setActiveTab('factory-calc'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-calc')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-calc' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -596,7 +631,7 @@ export default function App() {
                 <Calculator className="w-4 h-4 text-amber-400" /> Hitung Kebutuhan Bahan
               </button>
               <button
-                onClick={() => { setActiveTab('factory-barcode'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-barcode')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-barcode' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -604,7 +639,7 @@ export default function App() {
                 <ScanLine className="w-4 h-4 text-amber-400" /> Scan Barcode Factory
               </button>
               <button
-                onClick={() => { setActiveTab('factory-bom'); setSidebarOpen(false); }}
+                onClick={() => handleProtectedTabNav('factory-bom')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer ${
                   activeTab === 'factory-bom' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
@@ -647,33 +682,33 @@ export default function App() {
               <Zap className="w-3.5 h-3.5" /> Quick Workshop:
             </span>
             <button 
-              onClick={() => setActiveTab('rantai-produksi')} 
+              onClick={() => handleProtectedTabNav('rantai-produksi')} 
               className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
             >
               <span>⚡ Rantai Estafet</span> 
               <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded text-[10px] font-bold">7 Tahap</span>
             </button>
             <button 
-              onClick={() => setActiveTab('hrd-faceid')} 
+              onClick={() => handleProtectedTabNav('hrd-faceid')} 
               className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
             >
               <span>👤 Absen Face ID</span>
             </button>
             <button 
-              onClick={() => setActiveTab('factory-barcode')} 
+              onClick={() => handleProtectedTabNav('factory-barcode')} 
               className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
             >
               <span>📷 Scan Barcode</span>
             </button>
             <button 
-              onClick={() => setActiveTab('finance-cashflow')} 
+              onClick={() => handleProtectedTabNav('finance-cashflow')} 
               className="px-3 py-1.5 bg-slate-950 hover:bg-amber-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
             >
               <span>💰 Arus Kas</span>
             </button>
           </div>
 
-          {/* Bagian Kanan Header: Profil User & Tombol Garis Tiga (Notifikasi & Logout) */}
+          {/* Bagian Kanan Header: Profil User & Tombol Garis Tiga (Notifikasi & Ganti Password) */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <div className="hidden lg:flex items-center gap-2 text-xs text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl whitespace-nowrap">
               <span>👑 {currentUser.name} ({currentUser.role})</span>
@@ -691,15 +726,36 @@ export default function App() {
 
               {/* Dropdown Menu Bar di Pojok Kanan */}
               {topMenuOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl py-2 z-50 space-y-1">
+                <div className="absolute right-0 mt-2 w-56 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl py-2 z-50 space-y-1">
                   <div className="px-4 py-2 border-b border-slate-800 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                    Menu Cepat Perusahaan
+                    Menu Cepat & Akun
                   </div>
                   <button 
                     onClick={() => { setShowNotifModal(true); setTopMenuOpen(false); }}
                     className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer"
                   >
                     <Bell className="w-4 h-4 text-amber-400" /> Notifikasi Sistem
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const newPass = prompt("Masukkan Password Baru Anda:");
+                      if (newPass && newPass.trim() !== '') {
+                        const updatedUser = { ...currentUser, password: newPass };
+                        setCurrentUser(updatedUser);
+                        localStorage.setItem('core_current_user', JSON.stringify(updatedUser));
+                        
+                        // Update juga di list database user management
+                        const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
+                        const updatedList = savedUsers.map(u => u.name === currentUser.name ? { ...u, password: newPass } : u);
+                        localStorage.setItem('core_user_management_list', JSON.stringify(updatedList));
+
+                        alert("Password berhasil diubah!");
+                      }
+                      setTopMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-amber-300 hover:bg-slate-800/80 flex items-center gap-2.5 cursor-pointer font-semibold"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400" /> Ganti Password Mandiri
                   </button>
                   <div className="border-t border-slate-800 pt-1">
                     <button 
