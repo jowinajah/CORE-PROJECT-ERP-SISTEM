@@ -19,6 +19,7 @@ import VisiMisiView from './components/VisiMisiView';
 import FloatingMusicPlayer from './components/FloatingMusicPlayer';
 import CashflowView from './components/CashflowView';
 import PremierFinancialSuite from './components/PremierFinancialSuite';
+import ProductHppStrategyView from './components/ProductHppStrategyView';
 import { 
   LayoutDashboard, 
   Users, 
@@ -488,7 +489,7 @@ export default function App() {
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.premier ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
             </button>
 
-            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => { setActiveTab('ai-assistant'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -520,6 +521,14 @@ export default function App() {
                 }`}
               >
                 <ShieldCheck className="w-4 h-4 text-amber-400" /> 4. Strategi Finansial & HPP
+              </button>
+              <button
+                onClick={() => { setActiveTab('product-hpp-strategy'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'product-hpp-strategy' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Target className="w-4 h-4 text-amber-400" /> 5. HPP & Target Produk
               </button>
             </div>
           </div>
@@ -736,6 +745,7 @@ export default function App() {
             {activeTab === 'boss-notes' && <BossNotesRealtime />}
             {activeTab === 'finance-cashflow' && <CashflowView />}
             {activeTab === 'premier-financial' && <PremierFinancialSuite />}
+            {activeTab === 'product-hpp-strategy' && <ProductHppStrategyView />}
             {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
             {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
             {activeTab.startsWith('finance-') && activeTab !== 'finance-cashflow' && <FinanceViews tab={activeTab} />}
