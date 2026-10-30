@@ -1,34 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, DollarSign, User } from 'lucide-react';
+import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, ArrowLeft, X } from 'lucide-react';
 
 export default function InvoiceView() {
   const [invoiceList, setInvoiceList] = useState(() => {
-    const saved = localStorage.getItem('core_invoice_list');
+    const saved = localStorage.getItem('core_invoice_list_multiline');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
-      { id: 'INV-001', date: '2026-10-25', client: 'Hima UIN Bandung', product: 'Kemeja KKN', totalAmount: 15600000, dpAmount: 7800000, status: 'DP 50% Lunas' },
-      { id: 'INV-002', date: '2026-10-28', client: 'Cafe Kopi Senja', product: 'Apron & Uniform', totalAmount: 4750000, dpAmount: 4750000, status: 'Lunas (Full)' }
+      { 
+        id: 'INV-2026-001', 
+        date: '2026-10-25', 
+        client: 'Hima UIN Bandung', 
+        items: [
+          { description: 'Kemeja KKN (Nagata Drill)', qty: 120, price: 130000 },
+          { description: 'Topi KKN Bordir Logo Custom', qty: 120, price: 25000 }
+        ],
+        totalAmount: 18600000,
+        dpAmount: 9300000, 
+        status: 'DP 50% Lunas' 
+      },
+      { 
+        id: 'INV-2026-002', 
+        date: '2026-10-28', 
+        client: 'Cafe Kopi Senja', 
+        items: [
+          { description: 'Apron Barista Kanvas Premium', qty: 50, price: 95000 }
+        ],
+        totalAmount: 4750000,
+        dpAmount: 4750000, 
+        status: 'Lunas (Full)' 
+      }
     ];
   });
 
   useEffect(() => {
-    localStorage.setItem('core_invoice_list', JSON.stringify(invoiceList));
+    localStorage.setItem('core_invoice_list_multiline', JSON.stringify(invoiceList));
   }, [invoiceList]);
 
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  
+  // State form dengan dukungan multiple items (array)
   const [currentInv, setCurrentInv] = useState({
-    id: 'INV-003', date: new Date().toISOString().split('T')[0], client: '', product: '', totalAmount: '', dpAmount: '', status: 'Belum DP'
+    id: 'INV-2026-003', 
+    date: new Date().toISOString().split('T')[0], 
+    client: '', 
+    items: [{ description: '', qty: '', price: '' }],
+    dpAmount: '', 
+    status: 'Belum DP'
   });
+
+  // State untuk Preview Cetak Invoice Profesional
+  const [previewInvoice, setPreviewInvoice] = useState(null);
 
   const handleOpenAdd = () => {
     setIsEditMode(false);
     setCurrentInv({
-      id: 'INV-' + Math.floor(100 + Math.random() * 900),
+      id: 'INV-2026-' + Math.floor(100 + Math.random() * 900),
       date: new Date().toISOString().split('T')[0],
       client: '',
-      product: '',
-      totalAmount: '',
+      items: [{ description: '', qty: '', price: '' }],
       dpAmount: '',
       status: 'Belum DP'
     });
@@ -41,18 +71,51 @@ export default function InvoiceView() {
     setShowModal(true);
   };
 
+  // Tambah baris item baru di modal
+  const handleAddItemRow = () => {
+    setCurrentInv({
+      ...currentInv,
+      items: [...currentInv.items, { description: '', qty: '', price: '' }]
+    });
+  };
+
+  // Hapus baris item tertentu di modal
+  const handleRemoveItemRow = (index) => {
+    if (currentInv.items.length === 1) return; // Minimal 1 item
+    const updatedItems = currentInv.items.filter((_, i) => i !== index);
+    setCurrentInv({ ...currentInv, items: updatedItems });
+  };
+
+  // Update nilai item di baris tertentu
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...currentInv.items];
+    updatedItems[index][field] = value;
+    setCurrentInv({ ...currentInv, items: updatedItems });
+  };
+
+  // Hitung total otomatis dari semua baris item
+  const calculateTotal = (items) => {
+    return items.reduce((acc, item) => acc + (Number(item.qty || 0) * Number(item.price || 0)), 0);
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
-    if (!currentInv.client || !currentInv.totalAmount) return;
+    if (!currentInv.client || currentInv.items.length === 0) return;
 
-    const total = Number(currentInv.totalAmount);
-    const dp = Number(currentInv.dpAmount);
+    const total = calculateTotal(currentInv.items);
+    const dp = Number(currentInv.dpAmount) || 0;
     let calculatedStatus = currentInv.status;
     if (dp >= total) calculatedStatus = 'Lunas (Full)';
     else if (dp > 0) calculatedStatus = 'DP Terbayar';
     else calculatedStatus = 'Belum DP';
 
-    const formatted = { ...currentInv, totalAmount: total, dpAmount: dp, status: calculatedStatus };
+    const formatted = { 
+      ...currentInv, 
+      items: currentInv.items.map(i => ({ description: i.description, qty: Number(i.qty), price: Number(i.price) })),
+      totalAmount: total, 
+      dpAmount: dp, 
+      status: calculatedStatus 
+    };
 
     if (isEditMode) {
       setInvoiceList(invoiceList.map(item => item.id === currentInv.id ? formatted : item));
@@ -72,6 +135,125 @@ export default function InvoiceView() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
   };
 
+  // TAMPILAN PREVIEW INVOICE PROFESIONAL UNTUK PELANGGAN
+  if (previewInvoice) {
+    const sisaPelunasan = Number(previewInvoice.totalAmount) - Number(previewInvoice.dpAmount);
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto text-slate-900 bg-white p-8 sm:p-12 rounded-3xl shadow-2xl relative font-sans">
+        <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-4 mb-6">
+          <button 
+            onClick={() => setPreviewInvoice(null)}
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar Invoice
+          </button>
+          <button 
+            onClick={() => window.print()}
+            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
+          >
+            <Printer className="w-4 h-4" /> Cetak / Unduh PDF Invoice
+          </button>
+        </div>
+
+        {/* KOP SURAT INVOICE */}
+        <div className="flex justify-between items-start border-b-2 border-amber-500 pb-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center text-amber-400 font-bold transform rotate-45">
+                <div className="transform -rotate-45 text-xs">C</div>
+              </div>
+              <h1 className="text-xl font-extrabold tracking-widest uppercase text-slate-950">CORE PROJECT</h1>
+            </div>
+            <p className="text-xs text-slate-500">Konveksi, Garment, Seragam, & Digital Mockup Specialist</p>
+            <p className="text-[11px] text-slate-500">Workshop: Bandung, Jawa Barat | Telp/WA: 0812-3456-7890</p>
+          </div>
+          <div className="text-right space-y-1">
+            <h2 className="text-2xl font-black text-amber-600 uppercase tracking-wider">INVOICE RESMI</h2>
+            <p className="text-xs font-bold text-slate-700">{previewInvoice.id}</p>
+            <p className="text-xs text-slate-500">Tanggal: {previewInvoice.date}</p>
+            <span className="inline-block mt-1 px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold rounded-full">
+              Status: {previewInvoice.status}
+            </span>
+          </div>
+        </div>
+
+        {/* INFORMASI KLIEN */}
+        <div className="grid grid-cols-2 gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kepada Yth:</p>
+            <h3 className="text-base font-bold text-slate-900 mt-0.5">{previewInvoice.client}</h3>
+            <p className="text-xs text-slate-600">Pelanggan Setia CORE Project</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Metode Pembayaran:</p>
+            <p className="text-xs font-bold text-slate-900 mt-0.5">Transfer Bank BCA: 1234567890</p>
+            <p className="text-xs text-slate-600">a.n. Sahrul / CORE Project</p>
+          </div>
+        </div>
+
+        {/* TABEL MULTI-ITEM PESANAN */}
+        <div className="overflow-x-auto pt-2">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
+              <tr>
+                <th className="px-4 py-3 rounded-l-xl">No. Jenis Produk & Model Pesanan</th>
+                <th className="px-4 py-3 text-center">Jumlah (Qty)</th>
+                <th className="px-4 py-3 text-right">Harga Satuan</th>
+                <th className="px-4 py-3 text-right rounded-r-xl">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {previewInvoice.items.map((item, idx) => {
+                const subtotal = Number(item.qty) * Number(item.price);
+                return (
+                  <tr key={idx}>
+                    <td className="px-4 py-4 font-bold text-slate-900">
+                      {idx + 1}. {item.description}
+                    </td>
+                    <td className="px-4 py-4 text-center font-bold text-slate-800">{item.qty} Pcs</td>
+                    <td className="px-4 py-4 text-right text-slate-700">{formatRupiah(item.price)}</td>
+                    <td className="px-4 py-4 text-right font-bold text-slate-900">{formatRupiah(subtotal)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* RINCIAN TOTAL & PEMBAYARAN */}
+        <div className="flex justify-end pt-4">
+          <div className="w-72 space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-200 text-xs">
+            <div className="flex justify-between text-slate-600">
+              <span>Total Tagihan:</span>
+              <span className="font-bold text-slate-900">{formatRupiah(previewInvoice.totalAmount)}</span>
+            </div>
+            <div className="flex justify-between text-emerald-600 font-semibold">
+              <span>DP / Uang Muka Terbayar:</span>
+              <span>- {formatRupiah(previewInvoice.dpAmount)}</span>
+            </div>
+            <div className="border-t border-slate-300 pt-2 flex justify-between text-sm font-extrabold text-rose-600">
+              <span>Sisa Pelunasan:</span>
+              <span>{formatRupiah(sisaPelunasan)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CATATAN & TANDA TANGAN */}
+        <div className="pt-8 border-t border-slate-200 flex justify-between items-end text-xs text-slate-600">
+          <div className="space-y-1">
+            <p className="font-bold text-slate-900">Catatan:</p>
+            <p className="text-[11px] text-slate-500">1. Barang yang sudah diproduksi tidak dapat dibatalkan.</p>
+            <p className="text-[11px] text-slate-500">2. Pelunasan wajib dilakukan sebelum pengiriman pesanan.</p>
+          </div>
+          <div className="text-center space-y-12">
+            <p className="font-semibold text-slate-800">Hormat Kami,<br/><strong className="text-slate-950">CORE Project Workshop</strong></p>
+            <p className="text-[11px] font-bold text-amber-600 underline">( Kang Fahmi / Tim Finance )</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 text-slate-100 max-w-7xl mx-auto">
       {/* BANNER HEADER */}
@@ -79,7 +261,7 @@ export default function InvoiceView() {
         <div>
           <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">Modul Finance CORE</span>
           <h1 className="text-2xl font-bold text-white mt-1">Invoice & Tagihan DP Konsumen</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola pembuatan tagihan, pantau pembayaran DP (Uang Muka), dan sisa pelunasan PO.</p>
+          <p className="text-slate-400 text-sm mt-1">Kelola tagihan multi-produk, buat nota profesional, dan pantau pembayaran DP.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
@@ -101,17 +283,18 @@ export default function InvoiceView() {
               <tr>
                 <th className="px-4 py-3">No. Invoice</th>
                 <th className="px-4 py-3">Tanggal</th>
-                <th className="px-4 py-3">Nama Konsumen & Produk</th>
+                <th className="px-4 py-3">Nama Konsumen & Ringkasan Item</th>
                 <th className="px-4 py-3 text-right">Total Tagihan</th>
                 <th className="px-4 py-3 text-right">DP / Dibayar</th>
                 <th className="px-4 py-3 text-right">Sisa Pelunasan</th>
-                <th className="px-4 py-3 text-center">Status Pembayaran</th>
-                <th className="px-4 py-3 text-center">Aksi</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Aksi & Nota</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-xs">
               {invoiceList.map((inv) => {
                 const sisaPelunasan = Number(inv.totalAmount) - Number(inv.dpAmount);
+                const itemSummary = inv.items ? inv.items.map(i => `${i.description} (${i.qty} Pcs)`).join(', ') : '';
                 return (
                   <tr key={inv.id} className="hover:bg-slate-800/30">
                     <td className="px-4 py-3 font-bold text-amber-400">{inv.id}</td>
@@ -120,74 +303,10 @@ export default function InvoiceView() {
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-bold text-white text-sm">{inv.client}</p>
-                      <p className="text-slate-400 text-[11px]">{inv.product}</p>
+                      <p className="text-slate-400 text-[11px] truncate max-w-xs">{itemSummary}</p>
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-white">{formatRupiah(inv.totalAmount)}</td>
                     <td className="px-4 py-3 text-right font-bold text-emerald-400">{formatRupiah(inv.dpAmount)}</td>
                     <td className="px-4 py-3 text-right font-bold text-rose-400">{formatRupiah(sisaPelunasan)}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${inv.status.includes('Lunas') ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
-                        {inv.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center space-x-1">
-                      <button onClick={() => window.print()} title="Cetak / Print" className="p-1.5 text-slate-400 hover:text-amber-400 rounded hover:bg-slate-800 cursor-pointer inline-block"><Printer className="w-4 h-4" /></button>
-                      <button onClick={() => handleOpenEdit(inv)} title="Edit" className="p-1.5 text-slate-400 hover:text-amber-400 rounded hover:bg-slate-800 cursor-pointer inline-block"><Edit3 className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(inv.id)} title="Hapus" className="p-1.5 text-rose-400 hover:text-white rounded hover:bg-rose-500/20 cursor-pointer inline-block"><Trash2 className="w-4 h-4" /></button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* MODAL TAMBAH/EDIT INVOICE */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-amber-400">{isEditMode ? 'Edit Tagihan Invoice' : 'Buat Invoice & Tagihan Baru'}</h3>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. Invoice</label>
-                <input type="text" required value={currentInv.id} onChange={e => setCurrentInv({...currentInv, id: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Tanggal</label>
-                <input type="date" required value={currentInv.date} onChange={e => setCurrentInv({...currentInv, date: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Konsumen / Klien</label>
-              <input type="text" required placeholder="Contoh: PT Makmur Jaya" value={currentInv.client} onChange={e => setCurrentInv({...currentInv, client: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Produk / Keterangan PO</label>
-              <input type="text" required placeholder="Contoh: Kemeja PDH 100 Pcs" value={currentInv.product} onChange={e => setCurrentInv({...currentInv, product: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Total Tagihan (Rp)</label>
-                <input type="number" required placeholder="15000000" value={currentInv.totalAmount} onChange={e => setCurrentInv({...currentInv, totalAmount: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">DP / Bayar Awal (Rp)</label>
-                <input type="number" required placeholder="7500000" value={currentInv.dpAmount} onChange={e => setCurrentInv({...currentInv, dpAmount: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-slate-800 text-xs rounded-xl cursor-pointer">Batal</button>
-              <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1"><Check className="w-4 h-4" /> Simpan Invoice</button>
-            </div>
-          </form>
-        </div>
-      )}
-    </div>
-  );
-}
+                      <span className={
