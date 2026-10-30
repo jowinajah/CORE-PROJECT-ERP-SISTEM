@@ -1,14 +1,14 @@
 import React from 'react';
 import CashflowView from './CashflowView';
+import InvoiceView from './InvoiceView';
 import { Wallet } from 'lucide-react';
 
 export default function FinanceViews({ tab }) {
   return (
     <div className="w-full">
-      {/* Jika tab yang dipilih adalah cashflow / arus kas */}
       {tab === 'finance-cashflow' && <CashflowView />}
+      {tab === 'finance-invoice' && <InvoiceView />}
 
-      {/* Jika memilih tab Laba Rugi (P&L) */}
       {tab === 'finance-pl' && (
         <div className="space-y-6 text-slate-100 max-w-7xl mx-auto">
           <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl shadow-xl space-y-2">
@@ -25,8 +25,7 @@ export default function FinanceViews({ tab }) {
         </div>
       )}
 
-      {/* Placeholder untuk tab finance lainnya jika belum dibuat */}
-      {tab !== 'finance-cashflow' && tab !== 'finance-pl' && (
+      {tab !== 'finance-cashflow' && tab !== 'finance-invoice' && tab !== 'finance-pl' && (
         <div className="bg-slate-900 border border-slate-800 p-12 rounded-2xl text-center space-y-2 max-w-xl mx-auto">
           <h2 className="text-lg font-bold text-amber-400 uppercase tracking-wider">Modul Finance: {tab}</h2>
           <p className="text-xs text-slate-400">Fitur dan catatan untuk bagian ini sedang aktif dalam mode standby.</p>
