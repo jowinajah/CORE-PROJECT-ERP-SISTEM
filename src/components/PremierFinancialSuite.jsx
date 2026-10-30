@@ -25,18 +25,18 @@ export default function PremierFinancialSuite() {
     };
   });
 
-  // 3. State HPP & Hasil PO dengan Rincian Detail Komponen
+  // 3. State HPP & Hasil PO dengan Rincian Bahan Baku & Komponen Lainnya
   const [poCalculations, setPoCalculations] = useState(() => {
-    const saved = localStorage.getItem('core_premier_po_calc_detailed');
+    const saved = localStorage.getItem('core_premier_po_calc_detailed_v2');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
       { 
         id: 'PO-001', client: 'Hima UIN Bandung', product: 'Kemeja KKN', qty: 120, sellPrice: 130000, 
-        biayaJahit: 30000, biayaSablon: 20000, biayaAksesoris: 10000, biayaLembur: 5000, biayaReject: 5000 
+        biayaBahanBaku: 45000, biayaJahit: 30000, biayaSablon: 20000, biayaAksesoris: 10000, biayaLembur: 5000, biayaReject: 5000 
       },
       { 
         id: 'PO-002', client: 'Cafe Kopi Senja', product: 'Apron & Uniform', qty: 50, sellPrice: 95000, 
-        biayaJahit: 20000, biayaSablon: 12000, biayaAksesoris: 8000, biayaLembur: 3000, biayaReject: 2000 
+        biayaBahanBaku: 30000, biayaJahit: 20000, biayaSablon: 12000, biayaAksesoris: 8000, biayaLembur: 3000, biayaReject: 2000 
       }
     ];
   });
@@ -50,7 +50,7 @@ export default function PremierFinancialSuite() {
   }, [costs]);
 
   useEffect(() => {
-    localStorage.setItem('core_premier_po_calc_detailed', JSON.stringify(poCalculations));
+    localStorage.setItem('core_premier_po_calc_detailed_v2', JSON.stringify(poCalculations));
   }, [poCalculations]);
 
   // Modal / Form States
@@ -61,7 +61,7 @@ export default function PremierFinancialSuite() {
   const [poEdit, setPoEdit] = useState(null);
   const [poForm, setPoForm] = useState({ 
     id: '', client: '', product: '', qty: '', sellPrice: '', 
-    biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' 
+    biayaBahanBaku: '', biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' 
   });
 
   const [showCostModal, setShowCostModal] = useState(false);
@@ -71,7 +71,7 @@ export default function PremierFinancialSuite() {
   // Kalkulasi Total PO
   const totalPoRevenue = poCalculations.reduce((acc, item) => acc + (Number(item.qty) * Number(item.sellPrice)), 0);
   const totalPoHpp = poCalculations.reduce((acc, item) => {
-    const hppPcs = Number(item.biayaJahit) + Number(item.biayaSablon) + Number(item.biayaAksesoris) + Number(item.biayaLembur) + Number(item.biayaReject);
+    const hppPcs = Number(item.biayaBahanBaku) + Number(item.biayaJahit) + Number(item.biayaSablon) + Number(item.biayaAksesoris) + Number(item.biayaLembur) + Number(item.biayaReject);
     return acc + (Number(item.qty) * hppPcs);
   }, 0);
   const totalPoGrossProfit = totalPoRevenue - totalPoHpp;
@@ -99,6 +99,7 @@ export default function PremierFinancialSuite() {
       ...poForm,
       qty: Number(poForm.qty),
       sellPrice: Number(poForm.sellPrice),
+      biayaBahanBaku: Number(poForm.biayaBahanBaku),
       biayaJahit: Number(poForm.biayaJahit),
       biayaSablon: Number(poForm.biayaSablon),
       biayaAksesoris: Number(poForm.biayaAksesoris),
@@ -112,7 +113,7 @@ export default function PremierFinancialSuite() {
       setPoCalculations([formatted, ...poCalculations]);
     }
     setShowPoModal(false);
-    setPoForm({ id: '', client: '', product: '', qty: '', sellPrice: '', biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' });
+    setPoForm({ id: '', client: '', product: '', qty: '', sellPrice: '', biayaBahanBaku: '', biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' });
   };
 
   const handleDeletePo = (id) => {
@@ -155,7 +156,7 @@ export default function PremierFinancialSuite() {
           <div>
             <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">⭐ Fitur Premier BOS JOW</span>
             <h2 className="text-xl font-bold text-white mt-1">Pusat Strategi Finansial & HPP Konveksi</h2>
-            <p className="text-slate-400 text-xs">Analisis mendalam Target Penjualan, Struktur Biaya, serta Rincian HPP (Jahit, Sablon, Aksesoris, Lembur, Reject) per PO.</p>
+            <p className="text-slate-400 text-xs">Analisis mendalam Target Penjualan, Struktur Biaya, serta Rincian HPP (Bahan Baku, Jahit, Sablon, Aksesoris, Lembur, Reject) per PO.</p>
           </div>
         </div>
       </div>
@@ -210,7 +211,7 @@ export default function PremierFinancialSuite() {
           <button 
             onClick={() => { 
               setPoEdit(null); 
-              setPoForm({ id: `PO-00${poCalculations.length + 1}`, client: '', product: '', qty: '', sellPrice: '', biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' }); 
+              setPoForm({ id: `PO-00${poCalculations.length + 1}`, client: '', product: '', qty: '', sellPrice: '', biayaBahanBaku: '', biayaJahit: '', biayaSablon: '', biayaAksesoris: '', biayaLembur: '', biayaReject: '' }); 
               setShowPoModal(true); 
             }}
             className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-xl cursor-pointer shadow flex items-center gap-1.5"
@@ -243,6 +244,7 @@ export default function PremierFinancialSuite() {
                 <th className="px-3 py-3">No. PO & Klien</th>
                 <th className="px-3 py-3">Produk & Qty</th>
                 <th className="px-3 py-3 text-right">Harga Jual</th>
+                <th className="px-3 py-3 text-right">Bahan Baku</th>
                 <th className="px-3 py-3 text-right">Jahit /pcs</th>
                 <th className="px-3 py-3 text-right">Sablon/Sublim</th>
                 <th className="px-3 py-3 text-right">Aksesoris</th>
@@ -256,13 +258,14 @@ export default function PremierFinancialSuite() {
             </thead>
             <tbody className="divide-y divide-slate-800 text-xs">
               {poCalculations.map((item) => {
+                const bahanBaku = Number(item.biayaBahanBaku) || 0;
                 const jahit = Number(item.biayaJahit) || 0;
                 const sablon = Number(item.biayaSablon) || 0;
                 const aksesoris = Number(item.biayaAksesoris) || 0;
                 const lembur = Number(item.biayaLembur) || 0;
                 const reject = Number(item.biayaReject) || 0;
                 
-                const hppPcs = jahit + sablon + aksesoris + lembur + reject;
+                const hppPcs = bahanBaku + jahit + sablon + aksesoris + lembur + reject;
                 const profitPcs = Number(item.sellPrice) - hppPcs;
                 const totalRevenue = Number(item.qty) * Number(item.sellPrice);
                 const totalHpp = Number(item.qty) * hppPcs;
@@ -279,6 +282,7 @@ export default function PremierFinancialSuite() {
                       <span className="text-emerald-400 font-bold">{item.qty} Pcs</span>
                     </td>
                     <td className="px-3 py-3 text-right text-slate-300">{formatRupiah(item.sellPrice)}</td>
+                    <td className="px-3 py-3 text-right text-amber-300 font-medium">{formatRupiah(bahanBaku)}</td>
                     <td className="px-3 py-3 text-right text-slate-400">{formatRupiah(jahit)}</td>
                     <td className="px-3 py-3 text-right text-slate-400">{formatRupiah(sablon)}</td>
                     <td className="px-3 py-3 text-right text-slate-400">{formatRupiah(aksesoris)}</td>
@@ -296,7 +300,7 @@ export default function PremierFinancialSuite() {
               })}
               {poCalculations.length === 0 && (
                 <tr>
-                  <td colSpan="12" className="text-center py-6 text-slate-500 italic">Belum ada data kalkulasi PO.</td>
+                  <td colSpan="13" className="text-center py-6 text-slate-500 italic">Belum ada data kalkulasi PO.</td>
                 </tr>
               )}
             </tbody>
@@ -325,7 +329,7 @@ export default function PremierFinancialSuite() {
         </div>
       )}
 
-      {/* MODAL TAMBAH/EDIT PO DENGAN RINCIAN HPP LENGKAP */}
+      {/* MODAL TAMBAH/EDIT PO DENGAN RINCIAN HPP LENGKAP TERMASUK BAHAN BAKU */}
       {showPoModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSavePo} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-xl w-full shadow-2xl">
@@ -360,6 +364,10 @@ export default function PremierFinancialSuite() {
             <div className="border-t border-slate-800 pt-3">
               <p className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Rincian Komponen HPP / Pcs (Rp):</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Bahan Baku / Kain</label>
+                  <input type="number" required placeholder="40000" value={poForm.biayaBahanBaku} onChange={e => setPoForm({...poForm, biayaBahanBaku: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+                </div>
                 <div>
                   <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Biaya Jahit</label>
                   <input type="number" required placeholder="25000" value={poForm.biayaJahit} onChange={e => setPoForm({...poForm, biayaJahit: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
