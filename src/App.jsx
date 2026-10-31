@@ -176,8 +176,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans relative">
       
-      {/* Header Mobile */}
-      <div className="md:hidden bg-slate-900 border-b border-amber-500/20 p-4 flex items-center justify-between sticky top-0 z-50">
+      {/* Header Mobile (Disembunyikan saat print) */}
+      <div className="md:hidden bg-slate-900 border-b border-amber-500/20 p-4 flex items-center justify-between sticky top-0 z-50 print:hidden">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/30 border border-amber-100 transform rotate-45">
             <div className="w-4 h-4 bg-slate-950 transform -rotate-45"></div>
@@ -194,9 +194,9 @@ export default function App() {
         </button>
       </div>
 
-      {/* SIDEBAR UTAMA - ACCORDION MENU */}
+      {/* SIDEBAR UTAMA - ACCORDION MENU (Disembunyikan saat print) */}
       <aside className={`
-        fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out
+        fixed md:static inset-y-0 left-0 z-40 w-72 bg-slate-900 border-r border-amber-500/20 flex flex-col transition-transform duration-300 ease-in-out print:hidden
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Brand Header */}
@@ -679,8 +679,8 @@ export default function App() {
       {/* MAIN CONTENT AREA DENGAN TOP ACTION BAR */}
       <div className="flex-1 flex flex-col min-h-screen bg-slate-950 overflow-y-auto relative">
         
-        {/* TOP ACTION BAR DENGAN MENU DI POJOK KANAN */}
-        <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md">
+        {/* TOP ACTION BAR DENGAN MENU DI POJOK KANAN (Disembunyikan saat print) */}
+        <header className="bg-slate-900 border-b border-amber-500/20 px-4 py-3 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-md print:hidden">
           <div className="flex items-center gap-3 overflow-x-auto py-1 scrollbar-none">
             <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
               <Zap className="w-3.5 h-3.5" /> Quick Workshop:
@@ -777,7 +777,7 @@ export default function App() {
 
         {/* MODAL NOTIFIKASI */}
         {showNotifModal && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 print:hidden">
             <div className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl">
               <div className="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
@@ -835,8 +835,8 @@ export default function App() {
           </div>
         </main>
 
-        {/* WIDGET LIVE CHAT MENGAMBANG DI POJOK KIRI BAWAH */}
-        <div className="fixed bottom-6 left-6 z-50">
+        {/* WIDGET LIVE CHAT MENGAMBANG DI POJOK KIRI BAWAH (Disembunyikan saat print) */}
+        <div className="fixed bottom-6 left-6 z-50 print:hidden">
           {!isChatOpen ? (
             <button
               onClick={() => setIsChatOpen(true)}
@@ -897,8 +897,10 @@ export default function App() {
           )}
         </div>
 
-        {/* WIDGET PEMUTAR MUSIK MENGAMBANG */}
-        <FloatingMusicPlayer />
+        {/* WIDGET PEMUTAR MUSIK MENGAMBANG (Disembunyikan saat print) */}
+        <div className="print:hidden">
+          <FloatingMusicPlayer />
+        </div>
 
       </div>
 
