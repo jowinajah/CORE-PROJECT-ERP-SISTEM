@@ -32,7 +32,7 @@ export default function UserManagementView() {
       id: 'USR-' + Date.now(),
       name: '',
       email: '',
-      password: 'core' + Math.floor(100 + Math.random() * 900), // Password awal otomatis dari BOS
+      password: '123', // Password default diset '123' agar mudah diingat saat login manual
       role: 'Staff Produksi',
       division: 'Div. Produksi',
       status: 'Aktif'
@@ -50,10 +50,17 @@ export default function UserManagementView() {
     e.preventDefault();
     if (!currentUser.name || !currentUser.email) return;
 
+    const cleanedUser = {
+      ...currentUser,
+      name: currentUser.name.trim(),
+      email: currentUser.email.trim().toLowerCase(),
+      password: String(currentUser.password || '123').trim()
+    };
+
     if (isEditMode) {
-      setUsersList(usersList.map(u => u.id === currentUser.id ? currentUser : u));
+      setUsersList(usersList.map(u => u.id === cleanedUser.id ? cleanedUser : u));
     } else {
-      setUsersList([currentUser, ...usersList]);
+      setUsersList([cleanedUser, ...usersList]);
     }
     setShowModal(false);
   };
@@ -84,14 +91,14 @@ export default function UserManagementView() {
           <div>
             <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">⭐ Fitur Premier BOS JOW</span>
             <h2 className="text-xl font-bold text-white mt-1">Manajemen Akun Pengguna & Password Awal</h2>
-            <p className="text-slate-400 text-xs">BOS memberikan password awal saat pembuatan akun, dan staf dapat mengubah password secara mandiri.</p>
+            <p className="text-slate-400 text-xs">Password awal diset "123" agar mudah diakses, staf dapat mengubahnya mandiri.</p>
           </div>
         </div>
         <button 
           onClick={handleOpenAdd}
           className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
         >
-          <UserPlus className="w-4 h-4" /> Tambah Akun & Password Awal
+          <UserPlus className="w-4 h-4" /> Tambah Akun Baru
         </button>
       </div>
 
@@ -108,7 +115,7 @@ export default function UserManagementView() {
             <thead className="bg-slate-800/50 text-xs uppercase text-slate-400">
               <tr>
                 <th className="px-4 py-3">Nama & Email</th>
-                <th className="px-4 py-3">Password Awal / Aktif</th>
+                <th className="px-4 py-3">Password Aktif</th>
                 <th className="px-4 py-3">Divisi & Role</th>
                 <th className="px-4 py-3 text-center">Status Akses</th>
                 <th className="px-4 py-3 text-center">Aksi</th>
@@ -162,7 +169,7 @@ export default function UserManagementView() {
       {showModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-amber-400">{isEditMode ? 'Edit Akun Pengguna' : 'Tambah Akun & Password Awal'}</h3>
+            <h3 className="text-lg font-bold text-amber-400">{isEditMode ? 'Edit Akun Pengguna' : 'Tambah Akun Baru'}</h3>
             
             <div>
               <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Lengkap</label>
@@ -171,12 +178,12 @@ export default function UserManagementView() {
 
             <div>
               <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Email / Username</label>
-              <input type="email" required placeholder="andi@coreproject.com" value={currentUser.email} onChange={e => setCurrentUser({...currentUser, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+              <input type="text" required placeholder="andi atau andi@coreproject.com" value={currentUser.email} onChange={e => setCurrentUser({...currentUser, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Password Awal (Diberikan oleh BOS)</label>
-              <input type="text" required placeholder="Contoh: core123" value={currentUser.password} onChange={e => setCurrentUser({...currentUser, password: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold" />
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Password Awal</label>
+              <input type="text" required value={currentUser.password} onChange={e => setCurrentUser({...currentUser, password: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -187,7 +194,7 @@ export default function UserManagementView() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Status Akses</label>
+                <label className="px-1 block text-[10px] font-semibold text-slate-400 uppercase mb-1">Status Akses</label>
                 <select value={currentUser.status} onChange={e => setCurrentUser({...currentUser, status: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
                   <option value="Aktif">Aktif</option>
                   <option value="Non-Aktif">Non-Aktif</option>
