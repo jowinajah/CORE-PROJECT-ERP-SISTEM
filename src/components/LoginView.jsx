@@ -1,126 +1,109 @@
 import React, { useState } from 'react';
-import { User, KeyRound, Scissors } from 'lucide-react';
+import { Lock, User, ArrowRight } from 'lucide-react';
 
 export default function LoginView({ onLogin }) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (username === 'bosjow' && password === '123') {
-      onLogin({ name: 'BOS JOW', role: 'Owner / CEO', username: 'bosjow' });
-    } else if (username === 'marketing' && password === '123') {
-      onLogin({ name: 'Tim Marketing', role: 'Marketing & Sales', username: 'marketing' });
-    } else if (username === 'produksi' && password === '123') {
-      onLogin({ name: 'Kepala Workshop', role: 'Factory & Produksi', username: 'produksi' });
-    } else {
-      setError('Username atau Password salah! (Gunakan tombol demo di bawah)');
-    }
-  };
+    setErrorMsg('');
 
-  const handleQuickLogin = (userRole) => {
-    if (userRole === 'bosjow') {
-      onLogin({ name: 'BOS JOW', role: 'Owner / CEO', username: 'bosjow' });
-    } else if (userRole === 'marketing') {
-      onLogin({ name: 'Tim Marketing', role: 'Marketing & Sales', username: 'marketing' });
-    } else if (userRole === 'produksi') {
-      onLogin({ name: 'Kepala Workshop', role: 'Factory & Produksi', username: 'produksi' });
+    // Ambil database user dari localStorage yang dikelola oleh BOS JOW
+    const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
+    
+    // Default users jika localStorage kosong
+    const defaultUsers = [
+      { id: 'USR-01', name: 'Kang Fahmi', email: 'fahmi@coreproject.com', password: '123', role: 'Owner / BOS JOW', division: 'Executive', status: 'Aktif' },
+      { id: 'USR-02', name: 'Kodar', email: 'kodar@coreproject.com', password: '123', role: 'Staff Produksi', division: 'Div. Produksi', status: 'Aktif' },
+      { id: 'USR-03', name: 'Sahrul', email: 'sahrul@coreproject.com', password: '123', role: 'Staff Office', division: 'Div. Office', status: 'Aktif' },
+      { id: 'USR-04', name: 'Nita', email: 'nita@coreproject.com', password: '123', role: 'Staff Office & Admin', division: 'Div. Office', status: 'Aktif' },
+      { id: 'USR-05', name: 'Bani', email: 'bani@coreproject.com', password: '123', role: 'Staff Office & Operasional', division: 'Div. Office', status: 'Aktif' },
+    ];
+
+    const userDatabase = savedUsers.length > 0 ? savedUsers : defaultUsers;
+
+    // Cari user berdasarkan email/nama dan password yang cocok
+    const foundUser = userDatabase.find(
+      u => (u.email.toLowerCase() === email.toLowerCase() || u.name.toLowerCase() === email.toLowerCase()) && 
+           String(u.password) === String(password)
+    );
+
+    if (!foundUser) {
+      setErrorMsg('Email/Username atau Password salah!');
+      return;
     }
+
+    if (foundUser.status === 'Non-Aktif') {
+      setErrorMsg('Akun Anda dinonaktifkan oleh Owner. Akses ditolak.');
+      return;
+    }
+
+    // Login berhasil
+    onLogin(foundUser);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100">
-      <div className="max-w-md w-full bg-slate-900 border border-amber-500/30 p-8 rounded-2xl shadow-2xl space-y-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-300 via-amber-500 to-amber-700"></div>
-        
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-amber-500/40 p-8 rounded-3xl shadow-2xl max-w-md w-full space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 items-center justify-center shadow-lg shadow-amber-500/30 border border-amber-100 transform rotate-45 mb-2">
-            <div className="w-6 h-6 bg-slate-950 rounded-sm transform -rotate-45 flex items-center justify-center">
-              <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
-            </div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 text-slate-950 flex items-center justify-center font-bold mx-auto shadow-lg shadow-amber-500/30 transform rotate-45">
+            <div className="transform -rotate-45 font-extrabold text-lg">C</div>
           </div>
-          <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 uppercase tracking-widest">
-            CORE PROJECT
-          </h1>
-          <p className="text-xs text-amber-400/80 font-semibold tracking-wider">ERP WORKSHOP & CONFECTION</p>
-          <p className="text-xs text-slate-400 pt-2">Silakan login untuk masuk ke sistem perusahaan.</p>
+          <h1 className="text-xl font-extrabold text-white tracking-widest uppercase">CORE PROJECT</h1>
+          <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider">ERP WORKSHOP LOGIN</p>
         </div>
 
-        {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs rounded-xl text-center font-medium">
-            {error}
+        {errorMsg && (
+          <div className="p-3 bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs rounded-xl text-center font-medium animate-shake">
+            {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleLoginSubmit} className="space-y-4">
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Username</label>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Email / Username Karyawan</label>
             <div className="relative">
               <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
               <input 
                 type="text" 
                 required 
-                placeholder="Masukkan username..."
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+                placeholder="nama atau email@coreproject.com" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" 
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Password</label>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Password Rahasia</label>
             <div className="relative">
-              <KeyRound className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
               <input 
                 type="password" 
                 required 
-                placeholder="Masukkan password..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+                placeholder="••••••••" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" 
               />
             </div>
           </div>
 
           <button 
-            type="submit"
-            className="w-full py-2.5 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 cursor-pointer transition-all"
+            type="submit" 
+            className="w-full py-3 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all"
           >
-            Masuk ke Sistem
+            <span>Masuk ke Sistem ERP</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Tombol Login Cepat untuk Demo */}
-        <div className="pt-4 border-t border-slate-800 space-y-2">
-          <p className="text-[10px] text-slate-400 uppercase font-bold text-center">⚡ Login Cepat (Mode Demo):</p>
-          <div className="grid grid-cols-3 gap-2">
-            <button 
-              type="button"
-              onClick={() => handleQuickLogin('bosjow')}
-              className="px-2 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-xl text-[10px] font-bold cursor-pointer transition-all text-center"
-            >
-              👑 BOS JOW (Owner)
-            </button>
-            <button 
-              type="button"
-              onClick={() => handleQuickLogin('marketing')}
-              className="px-2 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 rounded-xl text-[10px] font-bold cursor-pointer transition-all text-center"
-            >
-              📈 Marketing
-            </button>
-            <button 
-              type="button"
-              onClick={() => handleQuickLogin('produksi')}
-              className="px-2 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl text-[10px] font-bold cursor-pointer transition-all text-center"
-            >
-              🏭 Produksi
-            </button>
-          </div>
-          <p className="text-[9px] text-slate-500 text-center pt-1">*Password untuk semua akun demo: <span className="text-amber-400 font-mono">123</span></p>
+        <div className="text-center pt-2 border-t border-slate-800 text-[11px] text-slate-500">
+          Gunakan akun dan password awal yang diberikan oleh BOS JOW.
         </div>
-
       </div>
     </div>
   );
