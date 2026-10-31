@@ -3,7 +3,7 @@ import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, ArrowLeft, X, 
 
 export default function InvoiceView() {
   const [invoiceList, setInvoiceList] = useState(() => {
-    const saved = localStorage.getItem('core_invoice_list_v3');
+    const saved = localStorage.getItem('core_invoice_list_v5');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
       { 
@@ -16,7 +16,7 @@ export default function InvoiceView() {
         ],
         totalAmount: 18600000,
         dpAmount: 9300000, 
-        status: 'UNPAID' 
+        status: 'Paid DP' 
       },
       { 
         id: 'INV-2026-002', 
@@ -27,13 +27,13 @@ export default function InvoiceView() {
         ],
         totalAmount: 4750000,
         dpAmount: 4750000, 
-        status: 'PAID' 
+        status: 'Paid' 
       }
     ];
   });
 
   useEffect(() => {
-    localStorage.setItem('core_invoice_list_v3', JSON.stringify(invoiceList));
+    localStorage.setItem('core_invoice_list_v5', JSON.stringify(invoiceList));
   }, [invoiceList]);
 
   const [showModal, setShowModal] = useState(false);
@@ -45,7 +45,7 @@ export default function InvoiceView() {
     client: '', 
     items: [{ description: '', qty: '', price: '' }],
     dpAmount: '', 
-    status: 'UNPAID'
+    status: 'Unpaid'
   });
 
   const [previewInvoice, setPreviewInvoice] = useState(null);
@@ -58,7 +58,7 @@ export default function InvoiceView() {
       client: '',
       items: [{ description: '', qty: '', price: '' }],
       dpAmount: '',
-      status: 'UNPAID'
+      status: 'Unpaid'
     });
     setShowModal(true);
   };
@@ -124,11 +124,11 @@ export default function InvoiceView() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
   };
 
-  // PREVIEW INVOICE PROFESIONAL UNTUK PELANGGAN
+  // PREVIEW INVOICE UKURAN A4 PROFESIONAL
   if (previewInvoice) {
     const sisaPelunasan = Number(previewInvoice.totalAmount) - Number(previewInvoice.dpAmount);
     return (
-      <div className="space-y-6 max-w-4xl mx-auto text-slate-900 bg-white p-8 sm:p-12 rounded-3xl shadow-2xl relative font-sans">
+      <div className="space-y-6 max-w-[210mm] mx-auto text-slate-900 bg-white p-10 sm:p-14 rounded-3xl shadow-2xl relative font-sans print:shadow-none print:p-0 print:w-full print:rounded-none">
         <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-4 mb-6">
           <button 
             onClick={() => setPreviewInvoice(null)}
@@ -140,7 +140,7 @@ export default function InvoiceView() {
             onClick={() => window.print()}
             className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
           >
-            <Printer className="w-4 h-4" /> Cetak / Unduh PDF Invoice
+            <Printer className="w-4 h-4" /> Cetak / Unduh A4 PDF
           </button>
         </div>
 
@@ -157,11 +157,11 @@ export default function InvoiceView() {
             <p className="text-[11px] text-slate-500">Workshop: Bandung, Jawa Barat | Telp/WA: 0812-3456-7890</p>
           </div>
           <div className="text-right space-y-1">
-            <h2 className="text-2xl font-black text-amber-600 uppercase tracking-wider">INVOICE RESMI</h2>
+            <h2 className="text-2xl font-black text-amber-600 uppercase tracking-wider">INVOICE</h2>
             <p className="text-xs font-bold text-slate-700">{previewInvoice.id}</p>
             <p className="text-xs text-slate-500">Tanggal: {previewInvoice.date}</p>
-            <span className={`inline-block mt-1 px-3 py-1 text-[10px] font-extrabold rounded-full ${previewInvoice.status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
-              STATUS: {previewInvoice.status}
+            <span className={`inline-block mt-1 px-3 py-1 text-[10px] font-extrabold rounded-full ${previewInvoice.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : previewInvoice.status === 'Paid DP' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}`}>
+              STATUS: {previewInvoice.status.toUpperCase()}
             </span>
           </div>
         </div>
@@ -171,7 +171,6 @@ export default function InvoiceView() {
           <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kepada Yth:</p>
             <h3 className="text-base font-bold text-slate-900 mt-0.5">{previewInvoice.client}</h3>
-            <p className="text-xs text-slate-600">Pelanggan Setia CORE Project</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Metode Pembayaran:</p>
@@ -227,15 +226,18 @@ export default function InvoiceView() {
           </div>
         </div>
 
-        {/* CATATAN & TANDA TANGAN */}
+        {/* CATATAN, TERIMAKASIH & TANDA TANGAN */}
         <div className="pt-8 border-t border-slate-200 flex justify-between items-end text-xs text-slate-600">
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <p className="font-bold text-slate-900">Catatan:</p>
             <p className="text-[11px] text-slate-500">1. Barang yang sudah diproduksi tidak dapat dibatalkan.</p>
             <p className="text-[11px] text-slate-500">2. Pelunasan wajib dilakukan sebelum pengiriman pesanan.</p>
+            <div className="pt-2">
+              <strong className="text-amber-600 text-sm">Terimakasih Telah Order!</strong>
+            </div>
           </div>
           <div className="text-center space-y-12">
-            <p className="font-semibold text-slate-800">Hormat Kami,<br/><strong className="text-slate-950">Tim Finance CORE Project</strong></p>
+            <p className="font-semibold text-slate-800">Hormat Kami,<br/><strong className="text-slate-950">FINANCE CORE PROJECT</strong></p>
             <p className="text-[11px] font-bold text-amber-600 underline">( Bagian Keuangan CORE Project )</p>
           </div>
         </div>
@@ -250,7 +252,7 @@ export default function InvoiceView() {
         <div>
           <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">Modul Finance CORE</span>
           <h1 className="text-2xl font-bold text-white mt-1">Invoice & Tagihan DP Konsumen</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola tagihan multi-produk, rekening PT Core Cipta Mode, dan status PAID/UNPAID.</p>
+          <p className="text-slate-400 text-sm mt-1">Kelola tagihan multi-produk, rekening PT Core Cipta Mode, dan status Unpaid / Paid DP / Paid.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
@@ -298,7 +300,7 @@ export default function InvoiceView() {
                     <td className="px-4 py-3 text-right font-bold text-emerald-400">{formatRupiah(inv.dpAmount)}</td>
                     <td className="px-4 py-3 text-right font-bold text-rose-400">{formatRupiah(sisaPelunasan)}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${inv.status === 'PAID' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'}`}>
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${inv.status === 'Paid' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : inv.status === 'Paid DP' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'}`}>
                         {inv.status}
                       </span>
                     </td>
@@ -317,7 +319,7 @@ export default function InvoiceView() {
         </div>
       </div>
 
-      {/* MODAL TAMBAH/EDIT INVOICE DENGAN TOTAL HASIL OTOMATIS */}
+      {/* MODAL TAMBAH/EDIT INVOICE */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -414,8 +416,9 @@ export default function InvoiceView() {
               <div>
                 <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Status Pembayaran</label>
                 <select value={currentInv.status} onChange={e => setCurrentInv({...currentInv, status: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold">
-                  <option value="UNPAID">UNPAID (Belum Lunas / DP)</option>
-                  <option value="PAID">PAID (Lunas Penuh)</option>
+                  <option value="Unpaid">Unpaid</option>
+                  <option value="Paid DP">Paid DP</option>
+                  <option value="Paid">Paid</option>
                 </select>
               </div>
             </div>
