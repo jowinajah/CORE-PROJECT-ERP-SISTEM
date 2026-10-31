@@ -10,6 +10,7 @@ export default function LoginView({ onLogin }) {
     e.preventDefault();
     setErrorMsg('');
 
+    // Bersihkan input dari spasi tersembunyi & ubah ke huruf kecil untuk email
     const cleanInput = email.trim().toLowerCase();
     const cleanPass = String(password).trim();
 
@@ -27,7 +28,7 @@ export default function LoginView({ onLogin }) {
       return;
     }
 
-    // CEK DATABASE KARYAWAN DARI LOCALSTORAGE
+    // AMBIL DATABASE KARYAWAN DARI LOCALSTORAGE
     const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
     const defaultUsers = [
       { id: 'USR-01', name: 'Kang Fahmi', email: 'fahmi@coreproject.com', password: '123', role: 'Owner / BOS JOW', division: 'Executive', status: 'Aktif' },
@@ -39,13 +40,20 @@ export default function LoginView({ onLogin }) {
 
     const userDatabase = savedUsers.length > 0 ? savedUsers : defaultUsers;
 
-    const foundUser = userDatabase.find(
-      u => (u.email.toLowerCase() === cleanInput || u.name.toLowerCase() === cleanInput) && 
-           String(u.password).trim() === cleanPass
-    );
+    // PENCARIAN YANG KEBAL SPASI & HURUF KAPITAL
+    const foundUser = userDatabase.find(u => {
+      const dbEmail = String(u.email || '').trim().toLowerCase();
+      const dbName = String(u.name || '').trim().toLowerCase();
+      const dbPass = String(u.password || '').trim();
+
+      const isMatchUser = (dbEmail === cleanInput || dbName === cleanInput);
+      const isMatchPass = (dbPass === cleanPass);
+
+      return isMatchUser && isMatchPass;
+    });
 
     if (!foundUser) {
-      setErrorMsg('Email/Username atau Password salah!');
+      setErrorMsg('Email/Username atau Password salah! Periksa kembali ketikan Anda.');
       return;
     }
 
@@ -82,7 +90,7 @@ export default function LoginView({ onLogin }) {
               <input 
                 type="text" 
                 required 
-                placeholder="fahmi@coreproject.com" 
+                placeholder="nama atau email@coreproject.com" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" 
