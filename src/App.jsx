@@ -120,7 +120,7 @@ export default function App() {
     const isOwner = currentUser.division === 'Executive' || currentUser.role.toLowerCase().includes('owner') || currentUser.name === 'Kang Fahmi';
 
     if (!isOwner) {
-      // Jika akun berstatus Admin / Staf Office, batasi hanya ke Fitur Workshop dan Invoice & Tagihan DP
+      // Jika akun berstatus Admin / Staf Office, batasi ke Dashboard, Fitur Workshop, dan Finance & Kas
       const isStaffAdminOrOffice = currentUser.role.toLowerCase().includes('admin') || currentUser.division === 'Div. Office';
       
       if (isStaffAdminOrOffice) {
@@ -132,11 +132,15 @@ export default function App() {
           'meeting-libur', 
           'notes', 
           'zoom', 
-          'finance-invoice'
+          'finance-pl',
+          'finance-cashflow',
+          'finance-ledger',
+          'finance-invoice',
+          'finance-ocr'
         ];
 
         if (!allowedTabsForAdmin.includes(tabKey)) {
-          alert(`🚫 AKSES DITOLAK!\n\nAkun "${currentUser.name}" (${currentUser.role}) hanya diizinkan mengakses menu Fitur Workshop dan Invoice & Tagihan DP.`);
+          alert(`🚫 AKSES DITOLAK!\n\nAkun "${currentUser.name}" (${currentUser.role}) hanya diizinkan mengakses menu Dashboard Overview, Fitur Workshop, serta Finance & Kas.`);
           return;
         }
       }
