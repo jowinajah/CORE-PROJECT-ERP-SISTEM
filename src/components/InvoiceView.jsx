@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, ArrowLeft, X, DollarSign } from 'lucide-react';
+import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, ArrowLeft, X, Download } from 'lucide-react';
 
 export default function InvoiceView() {
   const [invoiceList, setInvoiceList] = useState(() => {
@@ -124,11 +124,17 @@ export default function InvoiceView() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
   };
 
+  // FUNGSI CETAK / DOWNLOAD PDF OTOMATIS
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
   // PREVIEW INVOICE UKURAN A4 PROFESIONAL
   if (previewInvoice) {
     const sisaPelunasan = Number(previewInvoice.totalAmount) - Number(previewInvoice.dpAmount);
     return (
       <div className="space-y-6 max-w-[210mm] mx-auto text-slate-900 bg-white p-10 sm:p-14 rounded-3xl shadow-2xl relative font-sans print:shadow-none print:p-0 print:w-full print:rounded-none">
+        {/* Tombol Navigasi (Disembunyikan saat dicetak) */}
         <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-4 mb-6">
           <button 
             onClick={() => setPreviewInvoice(null)}
@@ -137,10 +143,10 @@ export default function InvoiceView() {
             <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar Invoice
           </button>
           <button 
-            onClick={() => window.print()}
+            onClick={handleDownloadPDF}
             className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
           >
-            <Printer className="w-4 h-4" /> Cetak / Unduh A4 PDF
+            <Download className="w-4 h-4" /> Unduh / Simpan PDF (A4)
           </button>
         </div>
 
@@ -252,7 +258,7 @@ export default function InvoiceView() {
         <div>
           <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">Modul Finance CORE</span>
           <h1 className="text-2xl font-bold text-white mt-1">Invoice & Tagihan DP Konsumen</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola tagihan multi-produk, rekening PT Core Cipta Mode, dan status Unpaid / Paid DP / Paid.</p>
+          <p className="text-slate-400 text-sm mt-1">Kelola tagihan multi-produk, rekening PT Core Cipta Mode, dan unduh nota format A4.</p>
         </div>
         <button 
           onClick={handleOpenAdd}
