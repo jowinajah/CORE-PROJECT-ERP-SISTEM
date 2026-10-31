@@ -10,11 +10,10 @@ export default function LoginView({ onLogin }) {
     e.preventDefault();
     setErrorMsg('');
 
-    // Bersihkan input dari spasi tersembunyi & ubah ke huruf kecil untuk email
     const cleanInput = email.trim().toLowerCase();
     const cleanPass = String(password).trim();
 
-    // MASTER OVERRIDE UNTUK BOS JOW
+    // 1. MASTER OVERRIDE BOS JOW
     if ((cleanInput === 'fahmi@coreproject.com' || cleanInput === 'kang fahmi' || cleanInput === 'fahmi') && cleanPass === '123') {
       const ownerUser = {
         id: 'USR-01',
@@ -28,8 +27,9 @@ export default function LoginView({ onLogin }) {
       return;
     }
 
-    // AMBIL DATABASE KARYAWAN DARI LOCALSTORAGE
+    // 2. AMBIL & NORMALISASI DATABASE KARYAWAN DARI LOCALSTORAGE
     const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
+    
     const defaultUsers = [
       { id: 'USR-01', name: 'Kang Fahmi', email: 'fahmi@coreproject.com', password: '123', role: 'Owner / BOS JOW', division: 'Executive', status: 'Aktif' },
       { id: 'USR-02', name: 'Kodar', email: 'kodar@coreproject.com', password: '123', role: 'Staff Produksi', division: 'Div. Produksi', status: 'Aktif' },
@@ -38,9 +38,21 @@ export default function LoginView({ onLogin }) {
       { id: 'USR-05', name: 'Bani', email: 'bani@coreproject.com', password: '123', role: 'Staff Office & Operasional', division: 'Div. Office', status: 'Aktif' },
     ];
 
-    const userDatabase = savedUsers.length > 0 ? savedUsers : defaultUsers;
+    // Auto-repair: pastikan setiap user di localStorage memiliki password (default '123' jika kosong)
+    const normalizedSavedUsers = savedUsers.map(u => ({
+      ...u,
+      password: u.password ? String(u.password).trim() : '123'
+    }));
 
-    // PENCARIAN YANG KEBAL SPASI & HURUF KAPITAL
+    // Gabungkan database agar user bawaan dan user baru sama-sama aktif
+    let userDatabase = [...normalizedSavedUsers];
+    defaultUsers.forEach(defU => {
+      if (!userDatabase.some(u => u.email.toLowerCase() === defU.email.toLowerCase() || u.name.toLowerCase() === defU.name.toLowerCase())) {
+        userDatabase.push(defU);
+      }
+    });
+
+    // 3. VALIDASI LOGIN
     const foundUser = userDatabase.find(u => {
       const dbEmail = String(u.email || '').trim().toLowerCase();
       const dbName = String(u.name || '').trim().toLowerCase();
