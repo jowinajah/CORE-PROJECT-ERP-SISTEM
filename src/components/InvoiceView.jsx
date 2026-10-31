@@ -123,6 +123,19 @@ export default function InvoiceView() {
     return (
       <div className="max-w-[210mm] mx-auto text-slate-900 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative font-sans print:shadow-none print:p-0 print:m-0 print:w-full print:max-w-none print:rounded-none">
         
+        {/* CSS Khusus untuk menghilangkan margin/header bawaan browser saat diprint */}
+        <style>{`
+          @media print {
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+            body {
+              background: white !important;
+            }
+          }
+        `}</style>
+
         {/* Tombol Kembali / Unduh (Disembunyikan saat print) */}
         <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-3 mb-6">
           <button 
