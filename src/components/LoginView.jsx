@@ -13,7 +13,7 @@ export default function LoginView({ onLogin }) {
     const cleanInput = email.trim().toLowerCase();
     const cleanPass = String(password).trim();
 
-    // 1. MASTER OVERRIDE UNTUK BOS JOW (DIJAMIN LANGSUNG MASUK)
+    // MASTER OVERRIDE UNTUK BOS JOW
     if ((cleanInput === 'fahmi@coreproject.com' || cleanInput === 'kang fahmi' || cleanInput === 'fahmi') && cleanPass === '123') {
       const ownerUser = {
         id: 'USR-01',
@@ -27,7 +27,7 @@ export default function LoginView({ onLogin }) {
       return;
     }
 
-    // 2. CEK DATABASE KARYAWAN DARI LOCALSTORAGE
+    // CEK DATABASE KARYAWAN DARI LOCALSTORAGE
     const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
     const defaultUsers = [
       { id: 'USR-01', name: 'Kang Fahmi', email: 'fahmi@coreproject.com', password: '123', role: 'Owner / BOS JOW', division: 'Executive', status: 'Aktif' },
@@ -45,7 +45,7 @@ export default function LoginView({ onLogin }) {
     );
 
     if (!foundUser) {
-      setErrorMsg('Email/Username atau Password salah! (Gunakan: fahmi@coreproject.com & Pass: 123)');
+      setErrorMsg('Email/Username atau Password salah!');
       return;
     }
 
@@ -114,9 +114,8 @@ export default function LoginView({ onLogin }) {
           </button>
         </form>
 
-        <div className="text-center pt-2 border-t border-slate-800 text-[11px] text-slate-500 space-y-1">
-          <p>Login Owner: <strong className="text-amber-400">fahmi@coreproject.com</strong></p>
-          <p>Password: <strong className="text-amber-400">123</strong></p>
+        <div className="text-center pt-2 border-t border-slate-800 text-[11px] text-slate-500">
+          PT Core Cipta Mode • Secure ERP System
         </div>
       </div>
     </div>
