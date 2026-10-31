@@ -3,7 +3,7 @@ import { FileText, Plus, Edit3, Trash2, Check, Printer, Calendar, ArrowLeft, X, 
 
 export default function InvoiceView() {
   const [invoiceList, setInvoiceList] = useState(() => {
-    const saved = localStorage.getItem('core_invoice_list_v5');
+    const saved = localStorage.getItem('core_invoice_list_simple_v1');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
       { 
@@ -17,23 +17,12 @@ export default function InvoiceView() {
         totalAmount: 18600000,
         dpAmount: 9300000, 
         status: 'Paid DP' 
-      },
-      { 
-        id: 'INV-2026-002', 
-        date: '2026-10-28', 
-        client: 'Cafe Kopi Senja', 
-        items: [
-          { description: 'Apron Barista Kanvas Premium', qty: 50, price: 95000 }
-        ],
-        totalAmount: 4750000,
-        dpAmount: 4750000, 
-        status: 'Paid' 
       }
     ];
   });
 
   useEffect(() => {
-    localStorage.setItem('core_invoice_list_v5', JSON.stringify(invoiceList));
+    localStorage.setItem('core_invoice_list_simple_v1', JSON.stringify(invoiceList));
   }, [invoiceList]);
 
   const [showModal, setShowModal] = useState(false);
@@ -124,129 +113,123 @@ export default function InvoiceView() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
   };
 
-  // FUNGSI CETAK / DOWNLOAD PDF OTOMATIS
   const handleDownloadPDF = () => {
     window.print();
   };
 
-  // PREVIEW INVOICE UKURAN A4 PROFESIONAL
+  // PREVIEW INVOICE SIMPLE 1 LEMBAR A4
   if (previewInvoice) {
     const sisaPelunasan = Number(previewInvoice.totalAmount) - Number(previewInvoice.dpAmount);
     return (
-      <div className="space-y-6 max-w-[210mm] mx-auto text-slate-900 bg-white p-10 sm:p-14 rounded-3xl shadow-2xl relative font-sans print:shadow-none print:p-0 print:w-full print:rounded-none">
-        {/* Tombol Navigasi (Disembunyikan saat dicetak) */}
-        <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-4 mb-6">
+      <div className="max-w-[210mm] mx-auto text-slate-900 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative font-sans print:shadow-none print:p-6 print:w-full print:rounded-none">
+        
+        {/* Tombol Kembali / Unduh (Disembunyikan saat print) */}
+        <div className="flex justify-between items-center print:hidden border-b border-slate-200 pb-3 mb-6">
           <button 
             onClick={() => setPreviewInvoice(null)}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer"
+            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar Invoice
+            <ArrowLeft className="w-4 h-4" /> Kembali
           </button>
           <button 
             onClick={handleDownloadPDF}
-            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
+            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 rounded-xl text-xs font-bold flex items-center gap-2 shadow cursor-pointer"
           >
-            <Download className="w-4 h-4" /> Unduh / Simpan PDF (A4)
+            <Download className="w-4 h-4" /> Unduh / Cetak PDF (A4)
           </button>
         </div>
 
-        {/* KOP SURAT INVOICE */}
-        <div className="flex justify-between items-start border-b-2 border-amber-500 pb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center text-amber-400 font-bold transform rotate-45">
-                <div className="transform -rotate-45 text-xs">C</div>
-              </div>
-              <h1 className="text-xl font-extrabold tracking-widest uppercase text-slate-950">CORE PROJECT</h1>
-            </div>
-            <p className="text-xs text-slate-500">Konveksi, Garment, Seragam, & Digital Mockup Specialist</p>
-            <p className="text-[11px] text-slate-500">Workshop: Bandung, Jawa Barat | Telp/WA: 0812-3456-7890</p>
+        {/* HEADER / KOP INVOICE */}
+        <div className="flex justify-between items-start border-b border-slate-300 pb-4 mb-4">
+          <div>
+            <h1 className="text-lg font-black tracking-wider uppercase text-slate-950">CORE PROJECT</h1>
+            <p className="text-[11px] text-slate-600 mt-0.5">Konveksi, Garment, & Seragam Specialist</p>
+            <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+              Jl. Sindangreret No. 25 & Jl. Cibiru Tonggoh No. 07, RT.04, <br/>
+              Cibiru Wetan, Kec. Cibiru, Kota Bandung, Jawa Barat 40625<br/>
+              Admin WA: <strong>081312646490</strong>
+            </p>
           </div>
-          <div className="text-right space-y-1">
-            <h2 className="text-2xl font-black text-amber-600 uppercase tracking-wider">INVOICE</h2>
-            <p className="text-xs font-bold text-slate-700">{previewInvoice.id}</p>
-            <p className="text-xs text-slate-500">Tanggal: {previewInvoice.date}</p>
-            <span className={`inline-block mt-1 px-3 py-1 text-[10px] font-extrabold rounded-full ${previewInvoice.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : previewInvoice.status === 'Paid DP' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}`}>
-              STATUS: {previewInvoice.status.toUpperCase()}
+          <div className="text-right">
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-wider">INVOICE</h2>
+            <p className="text-xs font-bold text-amber-700 mt-0.5">{previewInvoice.id}</p>
+            <p className="text-[11px] text-slate-500">Tanggal: {previewInvoice.date}</p>
+            <span className={`inline-block mt-1 px-2.5 py-0.5 text-[9px] font-extrabold rounded ${previewInvoice.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : previewInvoice.status === 'Paid DP' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}`}>
+              {previewInvoice.status.toUpperCase()}
             </span>
           </div>
         </div>
 
-        {/* INFORMASI KLIEN & REKENING */}
-        <div className="grid grid-cols-2 gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+        {/* INFORMASI KLIEN & PEMBAYARAN */}
+        <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 mb-4 text-xs">
           <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kepada Yth:</p>
-            <h3 className="text-base font-bold text-slate-900 mt-0.5">{previewInvoice.client}</h3>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Kepada Yth:</span>
+            <p className="font-bold text-slate-900 text-sm mt-0.5">{previewInvoice.client}</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Metode Pembayaran:</p>
-            <p className="text-xs font-bold text-slate-900 mt-0.5">Transfer Bank BCA: 2838446464</p>
-            <p className="text-xs text-slate-600">a.n. Core Cipta Mode PT</p>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Pembayaran Transfer:</span>
+            <p className="font-bold text-slate-900 mt-0.5">BCA: 2838446464</p>
+            <p className="text-[11px] text-slate-600">a.n. Core Cipta Mode PT</p>
           </div>
         </div>
 
-        {/* TABEL MULTI-ITEM PESANAN */}
-        <div className="overflow-x-auto pt-2">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
-              <tr>
-                <th className="px-4 py-3 rounded-l-xl">No. Jenis Produk & Model Pesanan</th>
-                <th className="px-4 py-3 text-center">Jumlah (Qty)</th>
-                <th className="px-4 py-3 text-right">Harga Satuan</th>
-                <th className="px-4 py-3 text-right rounded-r-xl">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {previewInvoice.items.map((item, idx) => {
-                const subtotal = Number(item.qty) * Number(item.price);
-                return (
-                  <tr key={idx}>
-                    <td className="px-4 py-4 font-bold text-slate-900">
-                      {idx + 1}. {item.description}
-                    </td>
-                    <td className="px-4 py-4 text-center font-bold text-slate-800">{item.qty} Pcs</td>
-                    <td className="px-4 py-4 text-right text-slate-700">{formatRupiah(item.price)}</td>
-                    <td className="px-4 py-4 text-right font-bold text-slate-900">{formatRupiah(subtotal)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {/* TABEL ITEM */}
+        <table className="w-full text-left text-xs mb-4">
+          <thead className="bg-slate-900 text-white uppercase text-[10px]">
+            <tr>
+              <th className="px-3 py-2 rounded-l-lg">Jenis Produk / Model Pesanan</th>
+              <th className="px-3 py-2 text-center">Qty</th>
+              <th className="px-3 py-2 text-right">Harga Satuan</th>
+              <th className="px-3 py-2 text-right rounded-r-lg">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 text-slate-800">
+            {previewInvoice.items.map((item, idx) => {
+              const subtotal = Number(item.qty) * Number(item.price);
+              return (
+                <tr key={idx}>
+                  <td className="px-3 py-2.5 font-medium">{idx + 1}. {item.description}</td>
+                  <td className="px-3 py-2.5 text-center font-bold">{item.qty} Pcs</td>
+                  <td className="px-3 py-2.5 text-right">{formatRupiah(item.price)}</td>
+                  <td className="px-3 py-2.5 text-right font-bold">{formatRupiah(subtotal)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
-        {/* RINCIAN TOTAL & PEMBAYARAN */}
-        <div className="flex justify-end pt-4">
-          <div className="w-72 space-y-2 bg-slate-50 p-5 rounded-2xl border border-slate-200 text-xs">
+        {/* RINGKASAN TOTAL */}
+        <div className="flex justify-end mb-6">
+          <div className="w-64 space-y-1.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
             <div className="flex justify-between text-slate-600">
               <span>Total Tagihan:</span>
               <span className="font-bold text-slate-900">{formatRupiah(previewInvoice.totalAmount)}</span>
             </div>
-            <div className="flex justify-between text-emerald-600 font-semibold">
-              <span>DP / Uang Muka Terbayar:</span>
+            <div className="flex justify-between text-emerald-700 font-medium">
+              <span>DP Terbayar:</span>
               <span>- {formatRupiah(previewInvoice.dpAmount)}</span>
             </div>
-            <div className="border-t border-slate-300 pt-2 flex justify-between text-sm font-extrabold text-rose-600">
+            <div className="border-t border-slate-300 pt-1.5 flex justify-between text-xs font-extrabold text-rose-600">
               <span>Sisa Pelunasan:</span>
               <span>{formatRupiah(sisaPelunasan)}</span>
             </div>
           </div>
         </div>
 
-        {/* CATATAN, TERIMAKASIH & TANDA TANGAN */}
-        <div className="pt-8 border-t border-slate-200 flex justify-between items-end text-xs text-slate-600">
-          <div className="space-y-1.5">
+        {/* CATATAN & TANDA TANGAN (COMPACT 1 LEMBAR) */}
+        <div className="pt-4 border-t border-slate-200 flex justify-between items-end text-[11px] text-slate-600">
+          <div className="space-y-1">
             <p className="font-bold text-slate-900">Catatan:</p>
-            <p className="text-[11px] text-slate-500">1. Barang yang sudah diproduksi tidak dapat dibatalkan.</p>
-            <p className="text-[11px] text-slate-500">2. Pelunasan wajib dilakukan sebelum pengiriman pesanan.</p>
-            <div className="pt-2">
-              <strong className="text-amber-600 text-sm">Terimakasih Telah Order!</strong>
-            </div>
+            <p className="text-slate-500">1. Pesanan yang diproduksi tidak dapat dibatalkan.</p>
+            <p className="text-slate-500">2. Pelunasan dilakukan sebelum pengiriman.</p>
+            <p className="font-bold text-amber-700 pt-1">Terimakasih Telah Order!</p>
           </div>
-          <div className="text-center space-y-12">
-            <p className="font-semibold text-slate-800">Hormat Kami,<br/><strong className="text-slate-950">FINANCE CORE PROJECT</strong></p>
-            <p className="text-[11px] font-bold text-amber-600 underline">( Bagian Keuangan CORE Project )</p>
+          <div className="text-center space-y-8">
+            <p className="text-slate-700">Hormat Kami,<br/><strong className="text-slate-950">FINANCE CORE PROJECT</strong></p>
+            <p className="font-bold text-amber-700 underline">( Bagian Keuangan )</p>
           </div>
         </div>
+
       </div>
     );
   }
@@ -421,7 +404,7 @@ export default function InvoiceView() {
               </div>
               <div>
                 <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Status Pembayaran</label>
-                <select value={currentInv.status} onChange={e => setCurrentInv({...currentInv, status: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold">
+                <select value={currentInv.status} onChange={e => setCurrentInjStatus(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold">
                   <option value="Unpaid">Unpaid</option>
                   <option value="Paid DP">Paid DP</option>
                   <option value="Paid">Paid</option>
