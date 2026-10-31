@@ -1,36 +1,16 @@
-import React, { useState } from 'react';
-import { Lock, User, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, User, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function LoginView({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [registeredUsers, setRegisteredUsers] = useState([]);
 
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    setErrorMsg('');
-
-    const cleanInput = email.trim().toLowerCase();
-    const cleanPass = String(password).trim();
-
-    // 1. MASTER OVERRIDE BOS JOW
-    if ((cleanInput === 'fahmi@coreproject.com' || cleanInput === 'kang fahmi' || cleanInput === 'fahmi') && cleanPass === '123') {
-      const ownerUser = {
-        id: 'USR-01',
-        name: 'Kang Fahmi',
-        email: 'fahmi@coreproject.com',
-        role: 'Owner / BOS JOW',
-        division: 'Executive',
-        status: 'Aktif'
-      };
-      onLogin(ownerUser);
-      return;
-    }
-
-    // 2. AMBIL & NORMALISASI DATABASE KARYAWAN DARI LOCALSTORAGE
-    const savedUsers = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
-    
-    const defaultUsers = [
+  // Muat daftar user saat halaman login dibuka & tampilkan di console untuk debug
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('core_user_management_list') || '[]');
+    const defaults = [
       { id: 'USR-01', name: 'Kang Fahmi', email: 'fahmi@coreproject.com', password: '123', role: 'Owner / BOS JOW', division: 'Executive', status: 'Aktif' },
       { id: 'USR-02', name: 'Kodar', email: 'kodar@coreproject.com', password: '123', role: 'Staff Produksi', division: 'Div. Produksi', status: 'Aktif' },
       { id: 'USR-03', name: 'Sahrul', email: 'sahrul@coreproject.com', password: '123', role: 'Staff Office', division: 'Div. Office', status: 'Aktif' },
@@ -38,39 +18,39 @@ export default function LoginView({ onLogin }) {
       { id: 'USR-05', name: 'Bani', email: 'bani@coreproject.com', password: '123', role: 'Staff Office & Operasional', division: 'Div. Office', status: 'Aktif' },
     ];
 
-    // Auto-repair: pastikan setiap user di localStorage memiliki password (default '123' jika kosong)
-    const normalizedSavedUsers = savedUsers.map(u => ({
-      ...u,
-      password: u.password ? String(u.password).trim() : '123'
-    }));
+    const activeList = saved.length > 0 ? saved : defaults;
+    setRegisteredUsers(activeList);
+    console.log("=== CORE PROJECT USER DATABASE ===", activeList);
+  }, []);
 
-    // Gabungkan database agar user bawaan dan user baru sama-sama aktif
-    let userDatabase = [...normalizedSavedUsers];
-    defaultUsers.forEach(defU => {
-      if (!userDatabase.some(u => u.email.toLowerCase() === defU.email.toLowerCase() || u.name.toLowerCase() === defU.name.toLowerCase())) {
-        userDatabase.push(defU);
-      }
-    });
+  const handleLoginSubmit = (e, overrideUser = null) => {
+    if (e) e.preventDefault();
+    setErrorMsg('');
 
-    // 3. VALIDASI LOGIN
-    const foundUser = userDatabase.find(u => {
-      const dbEmail = String(u.email || '').trim().toLowerCase();
-      const dbName = String(u.name || '').trim().toLowerCase();
-      const dbPass = String(u.password || '').trim();
+    let foundUser = null;
 
-      const isMatchUser = (dbEmail === cleanInput || dbName === cleanInput);
-      const isMatchPass = (dbPass === cleanPass);
+    if (overrideUser) {
+      foundUser = overrideUser;
+    } else {
+      const cleanInput = email.trim().toLowerCase();
+      const cleanPass = String(password).trim();
 
-      return isMatchUser && isMatchPass;
-    });
+      foundUser = registeredUsers.find(u => {
+        const dbEmail = String(u.email || '').trim().toLowerCase();
+        const dbName = String(u.name || '').trim().toLowerCase();
+        const dbPass = String(u.password || '').trim();
+
+        return (dbEmail === cleanInput || dbName === cleanInput) && dbPass === cleanPass;
+      });
+    }
 
     if (!foundUser) {
-      setErrorMsg('Email/Username atau Password salah! Periksa kembali ketikan Anda.');
+      setErrorMsg('Email/Username atau Password salah! Periksa kembali.');
       return;
     }
 
     if (foundUser.status === 'Non-Aktif') {
-      setErrorMsg('Akun Anda dinonaktifkan oleh Owner. Akses ditolak.');
+      setErrorMsg('Akun Anda dinonaktifkan oleh Owner.');
       return;
     }
 
@@ -94,7 +74,7 @@ export default function LoginView({ onLogin }) {
           </div>
         )}
 
-        <form onSubmit={handleLoginSubmit} className="space-y-4">
+        <form onSubmit={(e) => handleLoginSubmit(e)} className="space-y-4">
           <div>
             <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Email / Username</label>
             <div className="relative">
@@ -102,7 +82,7 @@ export default function LoginView({ onLogin }) {
               <input 
                 type="text" 
                 required 
-                placeholder="nama atau email@coreproject.com" 
+                placeholder="fahmi@coreproject.com atau kodar" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs text-white focus:border-amber-400 focus:outline-none" 
@@ -134,7 +114,28 @@ export default function LoginView({ onLogin }) {
           </button>
         </form>
 
-        <div className="text-center pt-2 border-t border-slate-800 text-[11px] text-slate-500">
+        {/* QUICK TEST PANEL UNTUK MEMASTIKAN LOGIN BERHASIL */}
+        <div className="pt-4 border-t border-slate-800 space-y-2">
+          <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5" /> Quick Test Akun Terdaftar:
+          </p>
+          <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1">
+            {registeredUsers.map((usr) => (
+              <button
+                key={usr.id}
+                type="button"
+                onClick={() => handleLoginSubmit(null, usr)}
+                className="p-2 bg-slate-950 hover:bg-amber-500/20 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left cursor-pointer transition-all"
+              >
+                <p className="text-[11px] font-bold text-white truncate">{usr.name}</p>
+                <p className="text-[9px] text-slate-400 truncate">{usr.role}</p>
+                <p className="text-[9px] text-amber-400 font-mono">Pass: {usr.password || '123'}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center pt-2 border-t border-slate-800 text-[10px] text-slate-500">
           PT Core Cipta Mode • Secure ERP System
         </div>
       </div>
