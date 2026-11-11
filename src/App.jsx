@@ -22,6 +22,7 @@ import PremierFinancialSuite from './components/PremierFinancialSuite';
 import ProductHppStrategyView from './components/ProductHppStrategyView';
 import UserManagementView from './components/UserManagementView';
 import UserGpsTrackingView from './components/UserGpsTrackingView';
+import BackupRestoreView from './components/BackupRestoreView';
 import { 
   LayoutDashboard, 
   Users, 
@@ -73,7 +74,8 @@ import {
   Target,
   ShieldCheck,
   Navigation,
-  Lock
+  Lock,
+  Database
 } from 'lucide-react';
 
 export default function App() {
@@ -531,7 +533,7 @@ export default function App() {
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openSections.premier ? 'rotate-180 text-amber-400' : 'rotate-0'}`} />
             </button>
 
-            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${openSections.premier ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => handleProtectedTabNav('ai-assistant')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -587,6 +589,14 @@ export default function App() {
                 }`}
               >
                 <Navigation className="w-4 h-4 text-amber-400" /> 7. Pelacakan GPS Karyawan
+              </button>
+              <button
+                onClick={() => handleProtectedTabNav('backup-restore')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'backup-restore' ? 'bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/20' : 'text-amber-300/80 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Database className="w-4 h-4 text-amber-400" /> 8. Backup & Sinkronisasi Data
               </button>
             </div>
           </div>
@@ -827,6 +837,7 @@ export default function App() {
             {activeTab === 'product-hpp-strategy' && <ProductHppStrategyView />}
             {activeTab === 'user-management' && <UserManagementView />}
             {activeTab === 'user-gps-tracking' && <UserGpsTrackingView currentUser={currentUser} />}
+            {activeTab === 'backup-restore' && <BackupRestoreView />}
             {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
             {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
             {activeTab.startsWith('finance-') && activeTab !== 'finance-cashflow' && <FinanceViews tab={activeTab} />}
