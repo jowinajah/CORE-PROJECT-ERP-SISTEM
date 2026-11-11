@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeftRight, TrendingUp, TrendingDown, Wallet, Calendar, Trash2, Check, Edit3, Paperclip, Eye, X, Image as ImageIcon, Sparkles, Loader2, Building, Receipt, CreditCard } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeftRight, TrendingUp, TrendingDown, Wallet, Calendar, Trash2, Check, Edit3, Paperclip, Eye, X, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 
 export default function CashflowView() {
   const [transactions, setTransactions] = useState(() => {
@@ -19,13 +19,16 @@ export default function CashflowView() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   
-  const [filterType, setFilterType] = useState('ALL'); // ALL, IN, OUT
+  const [filterType, setFilterType] = useState('ALL'); 
   const [previewImage, setPreviewImage] = useState(null); 
   
-  // State khusus AI Detail Scan Nota
+  // State khusus AI Scan Nota
   const [showScanModal, setShowScanModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanPreview, setScanPreview] = useState(null);
+
+  // Referensi langsung untuk tombol file input agar 100% responsif
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -42,7 +45,6 @@ export default function CashflowView() {
 
   const categoriesIn = ['DP Pelanggan', 'Pelunasan Proyek', 'Penjualan Ready Stock', 'Suntikan Modal / Lainnya'];
   
-  // Kategori Pengeluaran Lengkap Konveksi CORE Project
   const categoriesOut = [
     'Operasional', 
     'Fix Cost', 
@@ -93,8 +95,8 @@ export default function CashflowView() {
     setShowModal(true);
   };
 
-  // Simulasi AI Cerdas Membaca Detail Nota Konveksi
-  const handleAielScanUpload = (e) => {
+  // Fungsi utama pemindaian AI Nota Rinci
+  const handleAiScanUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -108,8 +110,8 @@ export default function CashflowView() {
       setTimeout(() => {
         const fileName = file.name.toLowerCase();
         let detectedCategory = 'Operasional';
-        let detectedVendor = 'Toko / Vendor Umum';
-        let detectedDesc = 'Pembelian kebutuhan workshop konveksi';
+        let detectedVendor = 'Toko / Vendor Konveksi';
+        let detectedDesc = 'Pembayaran operasional workshop';
         
         if (fileName.includes('lembur') || fileName.includes('overtime')) {
           detectedCategory = 'Lemburan';
@@ -146,9 +148,11 @@ export default function CashflowView() {
           proof: base64Image
         });
         setIsScanning(false);
-      }, 2000);
+      }, 1500);
     };
     reader.readAsDataURL(file);
+    // Reset nilai input agar bisa scan file yang sama jika diperlukan
+    e.target.value = null;
   };
 
   const handleFileChange = (e) => {
@@ -194,7 +198,6 @@ export default function CashflowView() {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
   };
 
-  // Kalkulasi Total Real-time
   let totalIn = 0;
   let totalOut = 0;
   transactions.forEach(t => {
@@ -211,20 +214,32 @@ export default function CashflowView() {
 
   return (
     <div className="space-y-6 text-slate-100 max-w-7xl mx-auto">
-      {/* BANNER HEADER DENGAN AI SCAN DETAIL */}
+      {/* Hidden file input untuk dipanggil secara instan via tombol */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        accept="image/*" 
+        onChange={handleAiScanUpload} 
+        className="hidden" 
+      />
+
+      {/* BANNER HEADER */}
       <div className="bg-gradient-to-r from-amber-500/20 via-slate-900 to-slate-900 border border-amber-500/40 p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <span className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold text-[10px] rounded-md uppercase tracking-wide">Modul Accounting & Detailed AI Scan</span>
+          <span className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold text-[10px] rounded-md uppercase tracking-wide">Modul Accounting & AI Expense Scanner</span>
           <h1 className="text-2xl font-black text-white mt-1">Arus Kas & AI Scanner Nota Rinci</h1>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1">Scan nota otomatis membaca vendor, nomor nota, kategori konveksi, hingga keterangan terperinci.</p>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">Scan nota otomatis membaca vendor, kategori konveksi, dan langsung memotong saldo kas.</p>
         </div>
         
         <div className="flex flex-wrap gap-2">
-          {/* TOMBOL AI SCAN NOTA RINCI */}
-          <label className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-lg shadow-amber-500/30 cursor-pointer transition-all">
+          {/* TOMBOL AI SCAN UTAMA (DIJAMIN AKTIF) */}
+          <button 
+            type="button"
+            onClick={() => fileInputRef.current.click()}
+            className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-lg shadow-amber-500/30 cursor-pointer transition-all"
+          >
             <Sparkles className="w-4 h-4 animate-bounce" /> 🤖 AI Scan Nota Rinci
-            <input type="file" accept="image/*" onChange={handleAielScanUpload} className="hidden" />
-          </label>
+          </button>
 
           <button 
             onClick={() => handleOpenAdd('IN')}
@@ -271,7 +286,7 @@ export default function CashflowView() {
         </div>
       </div>
 
-      {/* TABEL BUKU KAS RINCI */}
+      {/* TABEL BUKU KAS */}
       <div className="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-6 shadow-xl space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h3 className="text-md font-bold text-amber-400 flex items-center gap-2">
@@ -366,7 +381,7 @@ export default function CashflowView() {
         </div>
       </div>
 
-      {/* MODAL AI SCAN NOTA RINCI & REVIEW */}
+      {/* MODAL AI SCAN NOTA REVIEW */}
       {showScanModal && (
         <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-amber-500/40 p-6 rounded-3xl max-w-lg w-full space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -383,8 +398,8 @@ export default function CashflowView() {
               <div className="py-12 text-center space-y-4">
                 <Loader2 className="w-12 h-12 text-amber-400 animate-spin mx-auto" />
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-white">AI sedang membaca vendor, nomor nota & rincian...</p>
-                  <p className="text-xs text-slate-400">Mengkategorikan secara presisi ke buku kas konveksi.</p>
+                  <p className="text-sm font-bold text-white">AI sedang memindai vendor & rincian nota...</p>
+                  <p className="text-xs text-slate-400">Mengkategorikan pengeluaran secara otomatis.</p>
                 </div>
               </div>
             ) : (
@@ -395,7 +410,7 @@ export default function CashflowView() {
                   </div>
                   <div className="space-y-1">
                     <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded text-[10px] font-bold">✨ Sukses Diekstrak AI</span>
-                    <p className="text-[11px] text-slate-300">Periksa detail di bawah sebelum menyimpan ke sistem.</p>
+                    <p className="text-[11px] text-slate-300">Periksa detail di bawah sebelum menyimpan.</p>
                   </div>
                 </div>
 
@@ -426,19 +441,19 @@ export default function CashflowView() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nomor Nota / Struk</label>
-                    <input type="text" value={formData.invoiceNo} onChange={e => setFormData({...formData, invoiceNo: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono" placeholder="Cth: NOTA-4421" />
+                    <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. Nota / Struk</label>
+                    <input type="text" value={formData.invoiceNo} onChange={e => setFormData({...formData, invoiceNo: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono" placeholder="Opsional" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Vendor / Toko</label>
-                  <input type="text" required value={formData.vendor} onChange={e => setFormData({...formData, vendor: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold" placeholder="Cth: Toko Kain Mulia Jaya" />
+                  <input type="text" required value={formData.vendor} onChange={e => setFormData({...formData, vendor: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold" />
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Keterangan / Uraian Rinci</label>
-                  <textarea rows="2" required value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" placeholder="Cth: Pembelian 3 roll kain drill untuk seragam kkn"></textarea>
+                  <textarea rows="2" required value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"></textarea>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -490,7 +505,7 @@ export default function CashflowView() {
         </div>
       )}
 
-      {/* MODAL TAMBAH & EDIT TRANSAKSI MANUAL */}
+      {/* MODAL TAMBAH & EDIT MANUAL */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto text-xs">
