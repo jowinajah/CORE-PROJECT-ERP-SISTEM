@@ -23,6 +23,7 @@ import ProductHppStrategyView from './components/ProductHppStrategyView';
 import UserManagementView from './components/UserManagementView';
 import UserGpsTrackingView from './components/UserGpsTrackingView';
 import BackupRestoreView from './components/BackupRestoreView';
+import ResellerPartnershipView from './components/ResellerPartnershipView';
 import { 
   LayoutDashboard, 
   Users, 
@@ -838,8 +839,9 @@ export default function App() {
             {activeTab === 'user-management' && <UserManagementView />}
             {activeTab === 'user-gps-tracking' && <UserGpsTrackingView currentUser={currentUser} />}
             {activeTab === 'backup-restore' && <BackupRestoreView />}
+            {activeTab === 'mitra-reseller' && <ResellerPartnershipView />}
             {activeTab.startsWith('factory-') && <FactoryViews tab={activeTab} />}
-            {activeTab.startsWith('mitra-') && <MitraViews tab={activeTab} />}
+            {activeTab.startsWith('mitra-') && activeTab !== 'mitra-reseller' && <MitraViews tab={activeTab} />}
             {activeTab.startsWith('finance-') && activeTab !== 'finance-cashflow' && <FinanceViews tab={activeTab} />}
             {activeTab.startsWith('hrd-') && <HrdViews tab={activeTab} />}
             {activeTab.startsWith('marketing-') && <MarketingViews tab={activeTab} />}
