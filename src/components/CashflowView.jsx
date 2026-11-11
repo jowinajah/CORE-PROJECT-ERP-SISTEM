@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeftRight, TrendingUp, TrendingDown, Wallet, Calendar, Trash2, Check, Edit3, Paperclip, Eye, X, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 
 export default function CashflowView() {
@@ -26,9 +26,6 @@ export default function CashflowView() {
   const [showScanModal, setShowScanModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanPreview, setScanPreview] = useState(null);
-
-  // Referensi langsung untuk tombol file input agar 100% responsif
-  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -151,7 +148,6 @@ export default function CashflowView() {
       }, 1500);
     };
     reader.readAsDataURL(file);
-    // Reset nilai input agar bisa scan file yang sama jika diperlukan
     e.target.value = null;
   };
 
@@ -214,15 +210,6 @@ export default function CashflowView() {
 
   return (
     <div className="space-y-6 text-slate-100 max-w-7xl mx-auto">
-      {/* Hidden file input untuk dipanggil secara instan via tombol */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        accept="image/*" 
-        onChange={handleAiScanUpload} 
-        className="hidden" 
-      />
-
       {/* BANNER HEADER */}
       <div className="bg-gradient-to-r from-amber-500/20 via-slate-900 to-slate-900 border border-amber-500/40 p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
@@ -232,14 +219,16 @@ export default function CashflowView() {
         </div>
         
         <div className="flex flex-wrap gap-2">
-          {/* TOMBOL AI SCAN UTAMA (DIJAMIN AKTIF) */}
-          <button 
-            type="button"
-            onClick={() => fileInputRef.current.click()}
-            className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-lg shadow-amber-500/30 cursor-pointer transition-all"
-          >
+          {/* TOMBOL LABEL GABUNGAN (DIJAMIN AKTIF DI SEMUA BROWSER) */}
+          <label className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 shadow-lg shadow-amber-500/30 cursor-pointer transition-all">
             <Sparkles className="w-4 h-4 animate-bounce" /> 🤖 AI Scan Nota Rinci
-          </button>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleAiScanUpload} 
+              className="hidden" 
+            />
+          </label>
 
           <button 
             onClick={() => handleOpenAdd('IN')}
