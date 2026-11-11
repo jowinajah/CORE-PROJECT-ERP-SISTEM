@@ -1,63 +1,104 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeftRight, TrendingUp, TrendingDown, Plus, Wallet, Calendar, Tag, Trash2, Check, Filter } from 'lucide-react';
+import { ArrowLeftRight, TrendingUp, TrendingDown, Plus, Wallet, Calendar, Trash2, Check, Edit3, Paperclip, Eye, X, Image as ImageIcon } from 'lucide-react';
 
 export default function CashflowView() {
   const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem('core_cashflow_ledger_v2');
+    const saved = localStorage.getItem('core_cashflow_ledger_v3');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
-      { id: 'TRX-001', date: '2026-10-25', type: 'IN', category: 'DP Pelanggan', desc: 'DP 50% Kemeja KKN UIN Bandung', amount: 9300000, account: 'BCA Utama' },
-      { id: 'TRX-002', date: '2026-10-26', type: 'OUT', category: 'Bahan Baku Kain', desc: 'Beli 3 Roll Kain Unione Drill di Toko Kain', amount: 4500000, account: 'BCA Utama' },
-      { id: 'TRX-003', date: '2026-10-27', type: 'OUT', category: 'Upah Produksi / Jahit', desc: 'Bayar Upah Penjahit Sesi 1 Kemeja KKN', amount: 2500000, account: 'Kas Tunai Workshop' },
-      { id: 'TRX-004', date: '2026-10-28', type: 'IN', category: 'Pelunasan Proyek', desc: 'Pelunasan Apron Barista Cafe Kopi Senja', amount: 4750000, account: 'BCA Utama' },
-      { id: 'TRX-005', date: '2026-10-29', type: 'OUT', category: 'Operasional Workshop', desc: 'Bayar Token PLN & IndiHome Bulanan', amount: 750000, account: 'BCA Utama' }
+      { id: 'TRX-001', date: '2026-10-25', type: 'IN', category: 'DP Pelanggan', desc: 'DP 50% Kemeja KKN UIN Bandung', amount: 9300000, account: 'BCA Utama', proofName: 'nota_dp.jpg', proof: '' },
+      { id: 'TRX-002', date: '2026-10-26', type: 'OUT', category: 'Bahan Baku Kain', desc: 'Beli 3 Roll Kain Unione Drill di Toko Kain', amount: 4500000, account: 'BCA Utama', proofName: 'struk_kain.jpg', proof: '' }
     ];
   });
 
   useEffect(() => {
-    localStorage.setItem('core_cashflow_ledger_v2', JSON.stringify(transactions));
+    localStorage.setItem('core_cashflow_ledger_v3', JSON.stringify(transactions));
   }, [transactions]);
 
   const [showModal, setShowModal] = useState(false);
-  const [filterType, setFilterType] = useState('ALL'); // ALL, IN, OUT
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
   
+  const [filterType, setFilterType] = useState('ALL'); // ALL, IN, OUT
+  const [previewImage, setPreviewImage] = useState(null); // Untuk modal lihat bukti file
+
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     type: 'IN',
     category: 'DP Pelanggan',
     desc: '',
     amount: '',
-    account: 'BCA Utama'
+    account: 'BCA Utama (2838446464)',
+    proofName: '',
+    proof: ''
   });
 
-  // Kategori khusus konveksi & garment
   const categoriesIn = ['DP Pelanggan', 'Pelunasan Proyek', 'Penjualan Ready Stock', 'Suntikan Modal / Lainnya'];
   const categoriesOut = ['Bahan Baku Kain', 'Upah Produksi / Jahit', 'Sablon & Bordir', 'Aksesoris (Kancing/Label)', 'Operasional Workshop', 'Gaji Staff / Admin'];
   const accounts = ['BCA Utama (2838446464)', 'Kas Tunai Workshop', 'Rekening Cadangan'];
 
   const handleOpenAdd = (typeDefault = 'IN') => {
+    setIsEditMode(false);
+    setCurrentId(null);
     setFormData({
       date: new Date().toISOString().split('T')[0],
       type: typeDefault,
       category: typeDefault === 'IN' ? categoriesIn[0] : categoriesOut[0],
       desc: '',
       amount: '',
-      account: accounts[0]
+      account: accounts[0],
+      proofName: '',
+      proof: ''
     });
     setShowModal(true);
+  };
+
+  const handleOpenEdit = (trx) => {
+    setIsEditMode(true);
+    setCurrentId(trx.id);
+    setFormData({
+      date: trx.date,
+      type: trx.type,
+      category: trx.category,
+      desc: trx.desc,
+      amount: trx.amount,
+      account: trx.account,
+      proofName: trx.proofName || '',
+      proof: trx.proof || ''
+    });
+    setShowModal(true);
+  };
+
+  // Konversi file gambar/bukti ke Base64 agar tersimpan permanen di localStorage
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          proofName: file.name,
+          proof: reader.result // Base64 string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = (e) => {
     e.preventDefault();
     if (!formData.desc || !formData.amount) return;
 
-    const newTrx = {
-      id: 'TRX-' + Date.now(),
-      ...formData,
-      amount: Number(formData.amount)
-    };
-
-    setTransactions([newTrx, ...transactions]);
+    if (isEditMode) {
+      setTransactions(transactions.map(t => t.id === currentId ? { ...t, ...formData, amount: Number(formData.amount) } : t));
+    } else {
+      const newTrx = {
+        id: 'TRX-' + Date.now(),
+        ...formData,
+        amount: Number(formData.amount)
+      };
+      setTransactions([newTrx, ...transactions]);
+    }
     setShowModal(false);
   };
 
@@ -80,7 +121,6 @@ export default function CashflowView() {
   });
   const netBalance = totalIn - totalOut;
 
-  // Filter transaksi
   const filteredTransactions = transactions.filter(t => {
     if (filterType === 'IN') return t.type === 'IN';
     if (filterType === 'OUT') return t.type === 'OUT';
@@ -94,7 +134,7 @@ export default function CashflowView() {
         <div>
           <span className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold text-[10px] rounded-md uppercase tracking-wide">Modul Accounting & Cashflow</span>
           <h1 className="text-2xl font-black text-white mt-1">Arus Kas & Buku Kas Konveksi</h1>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1">Pencatatan keluar masuk kas spesifik produksi garment (DP, Kain, Upah Jahit, Operasional).</p>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">Pencatatan keluar masuk kas dengan fitur edit dan unggah bukti nota/file.</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -149,7 +189,6 @@ export default function CashflowView() {
             <ArrowLeftRight className="w-5 h-5" /> Riwayat Buku Kas & Transaksi ({filteredTransactions.length})
           </h3>
 
-          {/* Filter Tombol */}
           <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             <button 
               onClick={() => setFilterType('ALL')}
@@ -178,8 +217,9 @@ export default function CashflowView() {
               <tr>
                 <th className="px-4 py-3">Tanggal</th>
                 <th className="px-4 py-3">Kategori Konveksi</th>
-                <th className="px-4 py-3">Keterangan / Uraian</th>
+                <th className="px-4 py-3">Uraian / Keterangan</th>
                 <th className="px-4 py-3">Sumber Akun</th>
+                <th className="px-4 py-3 text-center">Bukti Nota</th>
                 <th className="px-4 py-3 text-right">Nominal (Rp)</th>
                 <th className="px-4 py-3 text-center">Aksi</th>
               </tr>
@@ -198,10 +238,25 @@ export default function CashflowView() {
                     </td>
                     <td className="px-4 py-3 font-semibold text-white">{trx.desc}</td>
                     <td className="px-4 py-3 text-slate-400">{trx.account}</td>
+                    <td className="px-4 py-3 text-center">
+                      {trx.proof ? (
+                        <button 
+                          onClick={() => setPreviewImage(trx.proof)}
+                          className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Lihat Nota
+                        </button>
+                      ) : (
+                        <span className="text-slate-600 text-[10px]">Tidak ada</span>
+                      )}
+                    </td>
                     <td className={`px-4 py-3 text-right font-black text-sm ${trx.type === 'IN' ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {trx.type === 'IN' ? '+' : '-'} {formatRupiah(trx.amount)}
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center space-x-1">
+                      <button onClick={() => handleOpenEdit(trx)} title="Edit Transaksi" className="p-1.5 text-slate-400 hover:text-amber-400 rounded hover:bg-slate-800 cursor-pointer inline-block">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
                       <button onClick={() => handleDelete(trx.id)} title="Hapus Transaksi" className="p-1.5 text-rose-400 hover:text-white rounded hover:bg-rose-500/20 cursor-pointer inline-block">
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -210,7 +265,7 @@ export default function CashflowView() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-8 text-slate-500">Belum ada data transaksi kas yang tercatat.</td>
+                  <td colSpan="7" className="text-center py-8 text-slate-500">Belum ada data transaksi kas yang tercatat.</td>
                 </tr>
               )}
             </tbody>
@@ -218,13 +273,37 @@ export default function CashflowView() {
         </div>
       </div>
 
-      {/* MODAL TAMBAH TRANSAKSI */}
+      {/* MODAL PRATINJAU BUKTI NOTA / GAMBAR */}
+      {previewImage && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-amber-500/40 p-4 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl relative">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+              <h3 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4" /> Pratinjau Bukti / Nota Transaksi
+              </h3>
+              <button onClick={() => setPreviewImage(null)} className="text-slate-400 hover:text-white cursor-pointer p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-center border border-slate-800 max-h-[70vh] overflow-auto">
+              <img src={previewImage} alt="Bukti Transaksi" className="max-w-full h-auto rounded-lg object-contain" />
+            </div>
+            <div className="flex justify-end">
+              <button onClick={() => setPreviewImage(null)} className="px-4 py-2 bg-slate-800 text-xs font-bold rounded-xl cursor-pointer">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL TAMBAH & EDIT TRANSAKSI */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl">
+          <form onSubmit={handleSave} className="bg-slate-900 border border-amber-500/30 p-6 rounded-2xl space-y-4 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-amber-400 flex items-center gap-2">
               {formData.type === 'IN' ? <TrendingUp className="w-5 h-5 text-emerald-400" /> : <TrendingDown className="w-5 h-5 text-rose-400" />}
-              Tambah Catatan Kas {formData.type === 'IN' ? 'Masuk' : 'Keluar'}
+              {isEditMode ? 'Edit Transaksi Kas' : `Tambah Kas ${formData.type === 'IN' ? 'Masuk' : 'Keluar'}`}
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
@@ -245,7 +324,7 @@ export default function CashflowView() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Kategori Transaksi Konveksi</label>
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Kategori Konveksi</label>
               <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
                 {(formData.type === 'IN' ? categoriesIn : categoriesOut).map((cat, i) => (
                   <option key={i} value={cat}>{cat}</option>
@@ -255,7 +334,7 @@ export default function CashflowView() {
 
             <div>
               <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Uraian / Keterangan Klien & Pesanan</label>
-              <input type="text" required placeholder="Cth: DP 50% Kemeja KKN UIN / Beli 3 Roll Kain" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+              <input type="text" required placeholder="Cth: DP 50% Kemeja KKN / Beli Kain" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -264,16 +343,33 @@ export default function CashflowView() {
                 <input type="number" required placeholder="5000000" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-mono font-bold" />
               </div>
               <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Sumber Rekening / Kas</label>
+                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Sumber Rekening</label>
                 <select value={formData.account} onChange={e => setFormData({...formData, account: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
                   {accounts.map((acc, i) => <option key={i} value={acc}>{acc}</option>)}
                 </select>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            {/* UPLOAD BUKTI FILE / NOTA */}
+            <div className="space-y-1.5 pt-1">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase">Unggah Bukti Nota / Foto (Opsional)</label>
+              <div className="flex items-center gap-2">
+                <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-xs font-semibold text-slate-300 cursor-pointer transition-all">
+                  <Paperclip className="w-4 h-4 text-amber-400" />
+                  <span className="truncate">{formData.proofName ? formData.proofName : 'Pilih file gambar/nota...'}</span>
+                  <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                </label>
+                {formData.proof && (
+                  <button type="button" onClick={() => setFormData({...formData, proof: '', proofName: ''})} className="p-2.5 bg-rose-500/15 border border-rose-500/30 text-rose-400 rounded-xl hover:bg-rose-500/30 text-xs font-bold">
+                    Hapus
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3">
               <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-slate-800 text-xs rounded-xl cursor-pointer">Batal</button>
-              <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1"><Check className="w-4 h-4" /> Simpan Transaksi</button>
+              <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1"><Check className="w-4 h-4" /> {isEditMode ? 'Simpan Perubahan' : 'Simpan Transaksi'}</button>
             </div>
           </form>
         </div>
