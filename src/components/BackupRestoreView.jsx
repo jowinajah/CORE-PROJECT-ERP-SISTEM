@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Upload, Database, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Download, Upload, Database } from 'lucide-react';
 
 export default function BackupRestoreView() {
   const [statusMsg, setStatusMsg] = useState('');
@@ -8,7 +8,6 @@ export default function BackupRestoreView() {
   const handleExportData = () => {
     try {
       const backupData = {};
-      // Ambil seluruh data dari localStorage yang berawalan 'core_'
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('core_')) {
@@ -30,7 +29,7 @@ export default function BackupRestoreView() {
     }
   };
 
-  // FUNGSI IMPOR / RESTORE DATA KE KOMPUTER INI
+  // FUNGSI IMPOR / RESTORE DATA (PERBAIKAN TYPO)
   const handleImportData = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -62,7 +61,7 @@ export default function BackupRestoreView() {
         <div>
           <span className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold text-[10px] rounded uppercase tracking-wide">⭐ Fitur Premier BOS JOW</span>
           <h1 className="text-2xl font-black text-white mt-1">Backup & Sinkronisasi Data Antar Komputer</h1>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1">Pindahkan seluruh data ERP (Arus Kas, Invoice, PO Project, dll.) antar komputer dengan praktis.</p>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">Pindahkan seluruh data ERP antar komputer dengan praktis.</p>
         </div>
         <div className="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30 hidden sm:block">
           <Database className="w-8 h-8" />
@@ -70,7 +69,7 @@ export default function BackupRestoreView() {
       </div>
 
       {statusMsg && (
-        <div className="p-4 bg-slate-900 border border-amber-500/40 text-amber-300 text-xs rounded-2xl text-center font-bold shadow-lg animate-in fade-in">
+        <div className="p-4 bg-slate-900 border border-amber-500/40 text-amber-300 text-xs rounded-2xl text-center font-bold shadow-lg">
           {statusMsg}
         </div>
       )}
@@ -84,7 +83,7 @@ export default function BackupRestoreView() {
             </div>
             <h3 className="text-lg font-bold text-white">1. Unduh Data (Backup)</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Klik tombol di bawah untuk mendownload seluruh catatan terbaru dari komputer ini menjadi satu file kecil berformat `.json`.
+              Klik tombol di bawah untuk mendownload seluruh catatan terbaru dari komputer ini menjadi satu file `.json`.
             </p>
           </div>
           <button 
@@ -103,12 +102,12 @@ export default function BackupRestoreView() {
             </div>
             <h3 className="text-lg font-bold text-white">2. Unggah Data (Restore)</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Pilih dan unggah file backup (.json) ke komputer lain untuk menyamakan seluruh data arus kas dan pesanan secara instan.
+              Pilih dan unggah file backup (.json) ke komputer lain untuk menyamakan data secara instan.
             </p>
           </div>
           <label className="w-full py-3 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all">
             <Upload className="w-4 h-4" /> Pilih & Unggah File Backup
-            <input type="file" accept=".json" onChange={handleImporData} className="hidden" />
+            <input type="file" accept=".json" onChange={handleImportData} className="hidden" />
           </label>
         </div>
       </div>
