@@ -3,7 +3,7 @@ import { Store, Users, Phone, MapPin, Award, TrendingUp, Plus, Edit3, Trash2, Ch
 
 export default function ResellerPartnershipView() {
   const [resellers, setResellers] = useState(() => {
-    const saved = localStorage.getItem('core_reseller_partners_v3');
+    const saved = localStorage.getItem('core_reseller_partners_v4');
     if (saved) { try { return JSON.parse(saved); } catch(e){ console.error(e); } }
     return [
       { 
@@ -15,7 +15,7 @@ export default function ResellerPartnershipView() {
         city: 'Bandung', 
         status: 'Aktif',
         joinDate: '2026-03-15',
-        monthlyTarget: 15000000, // Target omset per bulan
+        monthlyTarget: 15000000,
         orders: [
           { id: 'PO-901', poName: 'PO Kemeja Kampus', model: 'Kemeja Unione Drill', qty: 50, totalPrice: 7500000, deadline: '2026-11-15', commission: 750000 },
           { id: 'PO-902', poName: 'PO Jaket komunitas', model: 'Jaket Taslan Waterproof', qty: 30, totalPrice: 6000000, deadline: '2026-11-25', commission: 600000 }
@@ -39,12 +39,12 @@ export default function ResellerPartnershipView() {
   });
 
   useEffect(() => {
-    localStorage.setItem('core_reseller_partners_v3', JSON.stringify(resellers));
+    localStorage.setItem('core_reseller_partners_v4', JSON.stringify(resellers));
   }, [resellers]);
 
   const [selectedReseller, setSelectedReseller] = useState(null);
 
-  // State Modal Reseller Utama
+  // State Modal Reseller Utama (Tambah & Edit)
   const [showResellerModal, setShowResellerModal] = useState(false);
   const [isEditReseller, setIsEditReseller] = useState(false);
   const [currentReseller, setCurrentReseller] = useState({
@@ -75,7 +75,7 @@ export default function ResellerPartnershipView() {
   };
 
   const handleOpenEditReseller = (reseller, e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     setIsEditReseller(true);
     setCurrentReseller(reseller);
     setShowResellerModal(true);
@@ -98,7 +98,7 @@ export default function ResellerPartnershipView() {
   };
 
   const handleDeleteReseller = (id, e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     if (confirm('Yakin ingin menghapus data mitra ini beserta seluruh catatannya?')) {
       setResellers(resellers.filter(r => r.id !== id));
       if (selectedReseller && selectedReseller.id === id) setSelectedReseller(null);
@@ -179,12 +179,20 @@ export default function ResellerPartnershipView() {
               <p className="text-slate-400 text-xs mt-0.5">Pemilik: <strong>{selectedReseller.name}</strong> | WA: {selectedReseller.phone} | Kota: {selectedReseller.city}</p>
             </div>
           </div>
-          <button 
-            onClick={handleOpenAddOrder}
-            className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Tambah PO / Pesanan Baru
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={(e) => handleOpenEditReseller(selectedReseller, e)}
+              className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4" /> Edit Profil Mitra
+            </button>
+            <button 
+              onClick={handleOpenAddOrder}
+              className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Tambah PO / Pesanan
+            </button>
+          </div>
         </div>
 
         {/* KARTU STATISTIK & TARGET BULANAN */}
@@ -536,58 +544,3 @@ export default function ResellerPartnershipView() {
               <div>
                 <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Tanggal Bergabung</label>
                 <input type="date" value={currentReseller.joinDate} onChange={e => setCurrentReseller({...currentReseller, joinDate: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Pemilik / PIC</label>
-                <input type="text" required placeholder="Cth: Rian Maulana" value={currentReseller.name} onChange={e => setCurrentReseller({...currentReseller, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Nama Toko / Brand</label>
-                <input type="text" required placeholder="Cth: Bandung Clothing" value={currentReseller.storeName} onChange={e => setCurrentReseller({...currentReseller, storeName: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Tier / Level Mitra</label>
-                <select value={currentReseller.tier} onChange={e => setCurrentReseller({...currentReseller, tier: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-bold">
-                  {tiers.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Status Keanggotaan</label>
-                <select value={currentReseller.status} onChange={e => setCurrentReseller({...currentReseller, status: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-bold">
-                  {statuses.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">No. WhatsApp</label>
-                <input type="text" required placeholder="Cth: 081234567890" value={currentReseller.phone} onChange={e => setCurrentReseller({...currentReseller, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Kota / Wilayah</label>
-                <input type="text" required placeholder="Cth: Bandung" value={currentReseller.city} onChange={e => setCurrentReseller({...currentReseller, city: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Target Omset Per Bulan (Rp)</label>
-              <input type="number" required placeholder="15000000" value={currentReseller.monthlyTarget} onChange={e => setCurrentReseller({...currentReseller, monthlyTarget: Number(e.target.value)})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-mono font-bold" />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-3">
-              <button type="button" onClick={() => setShowResellerModal(false)} className="px-4 py-2 bg-slate-800 text-xs rounded-xl cursor-pointer">Batal</button>
-              <button type="submit" className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl cursor-pointer flex items-center gap-1"><Check className="w-4 h-4" /> Simpan Data Mitra</button>
-            </div>
-          </form>
-        </div>
-      )}
-    </div>
-  );
-}
